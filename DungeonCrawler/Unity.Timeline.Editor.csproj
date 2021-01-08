@@ -220,12 +220,15 @@
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Recording\TimelineRecording_PlayableAsset.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\inspectors\TimelineProjectSettings.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Trackhead.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Animation\CurveTreeViewNode.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\StyleNormalColorOverride.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Extensions\TrackExtensions.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Animation\AnimationClipExtensions.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\treeview\ManipulationsTracks.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\DisplayNameHelper.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\TimelineWindow_PreviewPlayMode.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\Modes\TimelineMode.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\AnimatedPropertyUtility.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\TimelineEditor.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\treeview\IRowGUI.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Manipulators\AddDelete\AddDeleteItemModeReplace.cs" />
@@ -303,9 +306,6 @@
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\KeyTraverser.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\inspectors\AnimationTrackInspector.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Manipulators\Move\MoveItemModeRipple.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Animation\CurveTreeViewNode.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Animation\AnimationClipExtensions.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\AnimatedPropertyUtility.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Unity.Timeline.Editor.asmdef" />
