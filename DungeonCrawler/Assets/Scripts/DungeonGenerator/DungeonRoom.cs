@@ -1,12 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+struct ID
+{
+    private int x, y;
+}
 
 public class DungeonRoom : MonoBehaviour
 {
     [SerializeField] private int height, width = 0;
-    [SerializeField] private Vector2[] doorPositions;
+    [SerializeField] private GameObject[] doors;
 
+    private ID roomID;
 
     // Start is called before the first frame update
     void Start()
@@ -19,4 +23,5 @@ public class DungeonRoom : MonoBehaviour
     {
         
     }
+
 }

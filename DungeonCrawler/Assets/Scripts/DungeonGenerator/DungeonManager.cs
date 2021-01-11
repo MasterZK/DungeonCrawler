@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +31,10 @@ public class DungeonManager : MonoBehaviour
         if (seed != 0)
             rand = new System.Random(seed);
 
-        spawnFloorMath(maxFloorSize);
+        do
+            spawnFloorMath(maxFloorSize);
+        while (spawnedRooms <= numberOfRooms / 2);
+
         printMapAsText();
     }
 
@@ -47,7 +49,7 @@ public class DungeonManager : MonoBehaviour
         floorMap = new int?[floorSize.x, floorSize.y];
 
         startRoomPos = new Vector2Int(floorSize.x / 2, floorSize.y / 2);
-        floorMap[floorSize.x / 2, floorSize.y / 2] = -1;
+        floorMap[floorSize.x / 2, floorSize.y / 2] = 9;
         spawnedRooms++;
 
         createSurroundingRooms(startRoomPos.x, startRoomPos.y);
@@ -83,8 +85,8 @@ public class DungeonManager : MonoBehaviour
         if (spawnedRooms == numberOfRooms)
             return;
 
-        floorMap[roomPosX, roomPosY] = ChooseRandom(0, rand.Next(1, spawnableRooms.Length), roomSpawnChance);
-
+        floorMap[roomPosX, roomPosY] = ChooseRandom(0, rand.Next(1, spawnableRooms.GetLength(0) + 1), roomSpawnChance);
+        Debug.Log(spawnableRooms.GetLength(0).ToString());
         if (floorMap[roomPosX, roomPosY] != 0)
         {
             spawnedRooms++;
@@ -103,9 +105,9 @@ public class DungeonManager : MonoBehaviour
             for (int j = 0; j < maxFloorSize.y; j++)
             {
                 if (floorMap[i, j] == null && floorMap[i, j] != 0)
-                    debugOutput.text += "-";
+                    debugOutput.text += " - ";
                 else
-                    debugOutput.text += floorMap[i, j].ToString();
+                    debugOutput.text += " " + floorMap[i, j];
             }
         }
     }

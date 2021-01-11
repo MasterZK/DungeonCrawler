@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonManager.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonRoom.cs" />
+    <Compile Include="Assets\Scripts\DungeonGenerator\DoorTeleporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
