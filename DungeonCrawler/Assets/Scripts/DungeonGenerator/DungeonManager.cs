@@ -2,10 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the generation of a dungeon floors
+/// by Zayarmoe Kyaw 
+/// </summary>
 public class DungeonManager : MonoBehaviour
 {
     [Header("Floor Settings")]
     [SerializeField] private int seed;
+    [SerializeField] private bool useSeed = true;
     [SerializeField] private int numberOfRooms;
     [SerializeField] private Vector2Int maxFloorSize;
     [SerializeField] private int?[,] floorMap;
@@ -28,12 +33,17 @@ public class DungeonManager : MonoBehaviour
         //spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
 
         rand = new System.Random();
-        if (seed != 0)
+        if (useSeed)
             rand = new System.Random(seed);
 
         do
+        {
             spawnFloorMath(maxFloorSize);
-        while (spawnedRooms <= numberOfRooms / 2);
+
+            //if (spawnedRooms <= numberOfRooms / 2 && spawnedRooms != 0)
+            //    rand = new System.Random(seed / 2);
+
+        } while (spawnedRooms <= numberOfRooms / 2);
 
         printMapAsText();
     }
@@ -46,6 +56,7 @@ public class DungeonManager : MonoBehaviour
 
     void spawnFloorMath(Vector2Int floorSize)
     {
+        spawnedRooms = 0;
         floorMap = new int?[floorSize.x, floorSize.y];
 
         startRoomPos = new Vector2Int(floorSize.x / 2, floorSize.y / 2);
@@ -86,11 +97,10 @@ public class DungeonManager : MonoBehaviour
             return;
 
         floorMap[roomPosX, roomPosY] = ChooseRandom(0, rand.Next(1, spawnableRooms.GetLength(0) + 1), roomSpawnChance);
-        Debug.Log(spawnableRooms.GetLength(0).ToString());
+
         if (floorMap[roomPosX, roomPosY] != 0)
         {
             spawnedRooms++;
-            //createSurroundingRooms(roomPosX,roomPosY);
             spawnBuffer.Push(new Vector2Int(roomPosX, roomPosY));
         }
     }
@@ -112,11 +122,16 @@ public class DungeonManager : MonoBehaviour
         }
     }
 
-    public int ChooseRandom(int valueOne, int valueTwo, float chance)
+
+    public int ChooseRandom(int valueOne, int valueTwo, float chance, bool useUnity = false)
     {
         chance = chance * 10;
 
-        if (UnityEngine.Random.Range(1, 11) > chance)
+        UnityEngine.Random.InitState(seed);
+        if (UnityEngine.Random.Range(1, 11) > chance && useUnity)
+            return valueOne;
+
+        if (rand.Next(1, 11) > chance)
             return valueOne;
 
         return valueTwo;
