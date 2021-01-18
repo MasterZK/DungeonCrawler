@@ -11,18 +11,26 @@ public class DungeonManager : MonoBehaviour
     [Header("Floor Settings")]
     [SerializeField] private int seed;
     [SerializeField] private bool useSeed = true;
-    [SerializeField] private int numberOfRooms;
+    [SerializeField] private int minRoomsSpawned;
+    [SerializeField] private int maxRoomsSpawned;
+    [SerializeField] private float floorDensity = 0.5f;
     [SerializeField] private Vector2Int maxFloorSize;
-    [SerializeField] private int?[,] floorMap;
+    [SerializeField] private int aproxDistanceRoomsX = 10;
+    [SerializeField] private int aproxDistanceRoomsY = 10;
 
     [Header("RoomPrefabs")]
+    [SerializeField] private RoomPrefabManager prefabManager;
     [SerializeField] private GameObject[] spawnableRooms;
     [SerializeField] private GameObject startSpawnRoom;
 
     [Header("Debug")]
+    [SerializeField] private bool debugTextoutput;
     [SerializeField] private Text debugOutput;
+    [SerializeField] private bool createRooms = false;
 
     private Vector2Int startRoomPos;
+    private int?[,] floorMap;
+    private DungeonRoom[,] spawnedFloor;
     private int spawnedRooms = 0;
     private Stack<Vector2Int> spawnBuffer = new Stack<Vector2Int>();
     private System.Random rand;
@@ -30,7 +38,7 @@ public class DungeonManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
+        spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
 
         rand = new System.Random();
         if (useSeed)
@@ -40,12 +48,22 @@ public class DungeonManager : MonoBehaviour
         {
             spawnFloorMath(maxFloorSize);
 
-            //if (spawnedRooms <= numberOfRooms / 2 && spawnedRooms != 0)
-            //    rand = new System.Random(seed / 2);
+            if (spawnedRooms <= minRoomsSpawned)
+            {
+                foreach (var room in spawnedFloor)
+                    if (room != null)
+                        GameObject.Destroy(room.gameObject);
+            }
 
-        } while (spawnedRooms <= numberOfRooms / 2);
+        } while (spawnedRooms <= minRoomsSpawned);
 
-        printMapAsText();
+        if (debugTextoutput)
+            printMapAsText();
+
+        if (createRooms)
+            foreach (var room in spawnedFloor)
+                if (room != null)
+                    room.setTeleporters();
     }
 
     // Update is called once per frame
@@ -58,17 +76,25 @@ public class DungeonManager : MonoBehaviour
     {
         spawnedRooms = 0;
         floorMap = new int?[floorSize.x, floorSize.y];
+        spawnedFloor = new DungeonRoom[floorSize.x, floorSize.y];
 
         startRoomPos = new Vector2Int(floorSize.x / 2, floorSize.y / 2);
         floorMap[floorSize.x / 2, floorSize.y / 2] = 9;
         spawnedRooms++;
+
+        if (createRooms)
+        {
+            var room = Instantiate(startSpawnRoom, Vector3.zero, startSpawnRoom.transform.rotation, this.transform);
+            spawnedFloor[floorSize.x / 2, floorSize.y / 2] = room.GetComponent<DungeonRoom>();
+            spawnedFloor[floorSize.x / 2, floorSize.y / 2].SetRoomID(startRoomPos.x, startRoomPos.y);
+        }
 
         createSurroundingRooms(startRoomPos.x, startRoomPos.y);
     }
 
     void createSurroundingRooms(int roomPosX, int roomPosY)
     {
-        if (spawnedRooms == numberOfRooms)
+        if (spawnedRooms >= maxRoomsSpawned)
             return;
 
         if (roomPosX - 1 >= 0 && floorMap[roomPosX - 1, roomPosY] == null)
@@ -91,18 +117,86 @@ public class DungeonManager : MonoBehaviour
 
     }
 
-    void createRoom(int roomPosX, int roomPosY, float roomSpawnChance = 0.5f)
+    void createRoom(int roomPosX, int roomPosY)
     {
-        if (spawnedRooms == numberOfRooms)
+        if (spawnedRooms == maxRoomsSpawned)
             return;
 
-        floorMap[roomPosX, roomPosY] = ChooseRandom(0, rand.Next(1, spawnableRooms.GetLength(0) + 1), roomSpawnChance);
+        floorMap[roomPosX, roomPosY] = ChooseRandom(0, rand.Next(1, spawnableRooms.GetLength(0) + 1), floorDensity);
 
         if (floorMap[roomPosX, roomPosY] != 0)
         {
             spawnedRooms++;
             spawnBuffer.Push(new Vector2Int(roomPosX, roomPosY));
+
+            if (createRooms)
+                createDungeonRoom(roomPosX, roomPosY, floorMap[roomPosX, roomPosY].Value, roomPosX, roomPosY);
         }
+    }
+
+    void createDungeonRoom(int x, int y, int roomType, int posX, int posY)
+    {
+        var room = Instantiate(spawnableRooms[roomType - 1], calculatePosition(posX, posY),
+            spawnableRooms[roomType - 1].transform.rotation, this.transform);
+
+        spawnedFloor[posX, posY] = room.GetComponent<DungeonRoom>();
+        spawnedFloor[posX, posY].SetRoomID(x, y);
+    }
+
+    Vector2 calculatePosition(int x, int y)
+    {
+        var xDif = x - startRoomPos.x;
+        var yDif = y - startRoomPos.y;
+
+        var xPos = aproxDistanceRoomsX * xDif;
+        var yPos = aproxDistanceRoomsY * yDif;
+
+        return new Vector2(xPos, yPos);
+    }
+
+    int checkNeighborCount(int x, int y)
+    {
+        int neighborCount = 0;
+
+        if (x - 1 >= 0 && floorMap[x - 1, y] != null)
+            neighborCount++;
+        if (x + 1 <= maxFloorSize.x - 1 && floorMap[x + 1, y] != null)
+            neighborCount++;
+        if (y - 1 >= 0 && floorMap[x, y - 1] != null)
+            neighborCount++;
+        if (y + 1 <= maxFloorSize.y - 1 && floorMap[x, y + 1] != null)
+            neighborCount++;
+
+        return neighborCount;
+    }
+
+    ID[] getEndRooms()
+    {
+        List<ID> endRooms = new List<ID>();
+
+        for (int x = 0; x < floorMap.GetLength(0); x++)
+        {
+            for (int y = 0; y < floorMap.GetLength(1); y++)
+            {
+                if (checkNeighborCount(x, y) == 1)
+                    endRooms.Add(new ID(x, y));
+            }
+        }
+
+        return endRooms.ToArray();
+    }
+
+    int getArrayDistance(Vector2Int pos1, Vector2Int pos2)
+    {
+        return (pos1 - pos2).sqrMagnitude;
+    }
+
+    public DungeonRoom getRoomByID(int x, int y)
+    {
+        if (x >= 0 && y >= 0 && x <= maxFloorSize.x - 1 && y <= maxFloorSize.y - 1)
+            return spawnedFloor[x, y];
+
+        return null;
     }
 
     void printMapAsText()
@@ -121,7 +215,6 @@ public class DungeonManager : MonoBehaviour
             }
         }
     }
-
 
     public int ChooseRandom(int valueOne, int valueTwo, float chance, bool useUnity = false)
     {
