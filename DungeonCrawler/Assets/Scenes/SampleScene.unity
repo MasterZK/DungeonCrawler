@@ -531,7 +531,7 @@ GameObject:
   - component: {fileID: 994529321}
   - component: {fileID: 994529319}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: FloorGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -551,8 +551,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 24042002
   useSeed: 1
-  minRoomsSpawned: 2
-  maxRoomsSpawned: 4
+  minRoomsSpawned: 10
+  maxRoomsSpawned: 20
   floorDensity: 0.5
   maxFloorSize: {x: 10, y: 20}
   aproxDistanceRoomsX: 25
