@@ -4,6 +4,7 @@ public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Player Attributes")]
     [SerializeField] private float movementSpeed = 1;
+    [SerializeField] private float deaccelerationMultiplier = 0.15f;
     [Range(0.1f, 0.9f)] [SerializeField] private float crouchMultiplier = 0.5f;
     [SerializeField] private float jumpVelocity = 1;
     [SerializeField] private float jumpMultiplier = 1;
@@ -35,6 +36,7 @@ public class PlayerMovement2D : MonoBehaviour
         checkGrounded();
         groundPlayer();
         checkPlayerInputH();
+        playerVelocityCancel();
         jump();
         crouch();
     }
@@ -48,6 +50,16 @@ public class PlayerMovement2D : MonoBehaviour
         playerRb2D.velocity = new Vector2(Mathf.Clamp(playerRb2D.velocity.x + horizontalInput,-movementSpeed * Time.deltaTime, movementSpeed * Time.deltaTime),playerRb2D.velocity.y);
 
         return Vector2.right * horizontalInput;
+    }
+
+    void playerVelocityCancel()
+    {
+        if (playerRb2D.velocity.x < -0.1f)
+            playerRb2D.velocity += Vector2.right * movementSpeed * deaccelerationMultiplier * Time.deltaTime ;
+        else if (playerRb2D.velocity.x > 0.1f)
+            playerRb2D.velocity -= Vector2.right * movementSpeed * deaccelerationMultiplier * Time.deltaTime ;
+        else if (-0.1f < playerRb2D.velocity.x  && playerRb2D.velocity.x < 0.1f)
+            playerRb2D.velocity = new Vector2(0,playerRb2D.velocity.y);
     }
 
     void crouch()
@@ -77,14 +89,6 @@ public class PlayerMovement2D : MonoBehaviour
         }
     }
 
-    void groundPlayer()
-    {
-       if (playerRb2D.velocity.y < 0)
-           playerRb2D.velocity += Vector2.up * Physics2D.gravity * fallMultiplier * Time.deltaTime;
-       else if (playerRb2D.velocity.y > 0 && !Input.GetButton("VerticalPos"))
-           playerRb2D.velocity += Vector2.up * Physics2D.gravity * jumpMultiplier * Time.deltaTime;
-    }
-
     bool checkGrounded()
     {
         int layer = 1 << 9;
@@ -92,6 +96,14 @@ public class PlayerMovement2D : MonoBehaviour
         grounded = Vector2.Distance(hit.point, this.transform.position) <= (this.GetComponent<Collider2D>().bounds.size.y * 0.55);
 
         return grounded;
+    }
+
+    void groundPlayer()
+    {
+       if (playerRb2D.velocity.y < 0)
+           playerRb2D.velocity += Vector2.up * Physics2D.gravity * fallMultiplier * Time.deltaTime;
+       else if (playerRb2D.velocity.y > 0 && !Input.GetButton("VerticalPos"))
+           playerRb2D.velocity += Vector2.up * Physics2D.gravity * jumpMultiplier * Time.deltaTime;
     }
 
     void OnDrawGizmosSelected()
