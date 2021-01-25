@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class PlayerMovement2D : MonoBehaviour
@@ -14,6 +15,7 @@ public class PlayerMovement2D : MonoBehaviour
     [SerializeField] private bool crouching = false;
     [SerializeField] private bool grounded = false;
     [SerializeField] private bool jumping = false;
+    [SerializeField] public bool transitioning = false;
 
     private Rigidbody2D playerRb2D;
     private Vector3 originalScale;
@@ -22,6 +24,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         playerRb2D = this.GetComponent<Rigidbody2D>();
         originalScale = this.transform.localScale;
+        this.gameObject.tag = "Player";
     }
 
     void Update()
@@ -66,6 +69,7 @@ public class PlayerMovement2D : MonoBehaviour
         crouching = crouchInput != 0;
 
         this.transform.localScale = crouching == true ? originalScale / 2 : originalScale;
+        this.transform.DOScale(crouching == true ? originalScale / 2 : originalScale, 0.3f);
 
         return crouching;
     }
@@ -95,7 +99,9 @@ public class PlayerMovement2D : MonoBehaviour
     {
         int layer = 1 << 9;
         RaycastHit2D hit = Physics2D.Raycast(this.transform.position, Vector2.down, Mathf.Infinity, layer);
-        grounded = Vector2.Distance(hit.point, this.transform.position) <= (this.GetComponent<Collider2D>().bounds.size.y * 0.55);
+        //grounded = Vector2.Distance(hit.point, this.transform.position) <= (this.GetComponent<Collider2D>().bounds.size.y * 0.6f);
+        var distance = (hit.point - this.GetComponent<Rigidbody2D>().position).magnitude;
+        grounded = distance > 0 && distance <= (this.GetComponent<Collider2D>().bounds.size.y * 0.6f);
 
         return grounded;
     }
