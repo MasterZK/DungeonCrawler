@@ -18,14 +18,12 @@ public class PlayerMovement2D : MonoBehaviour
     private Rigidbody2D playerRb2D;
     private Vector3 originalScale;
 
-    // Start is called before the first frame update
     void Start()
     {
         playerRb2D = this.GetComponent<Rigidbody2D>();
         originalScale = this.transform.localScale;
     }
 
-    // Update is called once per frame
     void Update()
     {
         checkJumpInput();
@@ -62,13 +60,17 @@ public class PlayerMovement2D : MonoBehaviour
             playerRb2D.velocity = new Vector2(0,playerRb2D.velocity.y);
     }
 
-    void crouch()
+    bool crouch()
     {
         var crouchInput = Input.GetAxisRaw("VerticalNeg");
         crouching = crouchInput != 0;
 
         this.transform.localScale = crouching == true ? originalScale / 2 : originalScale;
+
+        return crouching;
     }
+    
+    public bool getCrouching() => crouching;
 
     bool checkJumpInput()
     {
@@ -97,6 +99,8 @@ public class PlayerMovement2D : MonoBehaviour
 
         return grounded;
     }
+
+    public bool getGrounded() => grounded;
 
     void groundPlayer()
     {
