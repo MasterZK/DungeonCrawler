@@ -1,47 +1,81 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DoorTeleporter : MonoBehaviour
 {
-    [SerializeField] private Vector3 newPosition;
+    [SerializeField] private Vector3 destinationPosition;
     [SerializeField] public Transform spawnPoint;
-    [SerializeField] private Animator blackScreen;
-    //[SerializeField] private GameObject playerCamera;
+    [SerializeField] private Image screenFader;
     [SerializeField] private float transitionSpeed = 0.40f;
+    [SerializeField] private GameObject connectedPlatform;
+
+    private Effector2D platformEffector2D;
+    private Collider2D collider;
 
     void Awake()
     {
-        blackScreen = GameObject.Find("ScreenFade").GetComponent<Animator>();
+        screenFader = GameObject.Find("ScreenFade").GetComponent<Image>();
+        collider = this.GetComponent<Collider2D>();
+
+        if (connectedPlatform)
+            platformEffector2D = connectedPlatform.GetComponent<Effector2D>();
     }
 
     void Update()
     {
-        this.GetComponent<Collider2D>().isTrigger = true;
-        if (newPosition == Vector3.zero)
-            this.GetComponent<Collider2D>().isTrigger = false;
+        collider.isTrigger = true;
+        if (connectedPlatform)
+        {
+            platformEffector2D.enabled = true;
+            if (!connectedPlatform.GetComponent<Platform>())
+                connectedPlatform.AddComponent<Platform>();
+        }
+
+        if (destinationPosition == Vector3.zero)
+        {
+            collider.isTrigger = false;
+            if (connectedPlatform)
+            {
+                platformEffector2D.enabled = false;
+                Destroy(connectedPlatform.GetComponent<Platform>());
+            }
+        }
     }
 
     public void SetTeleportDestination(Vector3 destination)
     {
-        newPosition = destination;
+        destinationPosition = destination;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (newPosition == Vector3.zero)
+        if (destinationPosition == Vector3.zero)
             return;
 
         if (other.gameObject.CompareTag("Player"))
         {
-            blackScreen.Play(("ScreenFadeOn"));
-            StartCoroutine((WaitFor(transitionSpeed, other)));
+            if (other.gameObject.GetComponent<PlayerMovement2D>().transitioning)
+                return;
+
+            StartCoroutine(ScreenFade());
+            StartCoroutine(MovePlayer(other));
         }
     }
 
-    IEnumerator WaitFor(float seconds, Collider2D other)
+    IEnumerator MovePlayer(Collider2D player)
     {
-        yield return new WaitForSeconds(seconds);
-        other.transform.position = newPosition;
-        //playerCamera.transform.position = newPosition.position;
+        player.GetComponent<PlayerMovement2D>().transitioning = true;
+        var tween = player.GetComponent<Rigidbody2D>().DOMove(destinationPosition, transitionSpeed);
+        yield return tween.WaitForCompletion();
+        player.GetComponent<PlayerMovement2D>().transitioning = false;
+    }
+
+    IEnumerator ScreenFade()
+    {
+        var fading = screenFader.DOFade(100.0f, transitionSpeed / 2);
+        yield return fading.WaitForCompletion();
+        screenFader.DOFade(0.0f, transitionSpeed / 2);
     }
 }

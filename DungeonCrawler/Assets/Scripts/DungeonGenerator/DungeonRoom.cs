@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 public struct ID
@@ -88,8 +87,6 @@ public class DungeonRoom : MonoBehaviour
         this.gameObject.name = (roomID.x + 1) + " " + (roomID.y + 1);
     }
 
-    public ID GetRoomID()
-    {
-        return roomID;
-    }
+    public ID GetRoomID() => roomID;
+    
 }

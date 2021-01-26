@@ -35,7 +35,6 @@ public class DungeonManager : MonoBehaviour
     private Stack<Vector2Int> spawnBuffer = new Stack<Vector2Int>();
     private System.Random rand;
 
-    // Start is called before the first frame update
     void Start()
     {
         spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
@@ -66,7 +65,6 @@ public class DungeonManager : MonoBehaviour
                     room.setTeleporters();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
