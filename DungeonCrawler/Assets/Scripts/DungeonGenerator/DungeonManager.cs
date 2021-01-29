@@ -27,6 +27,8 @@ public class DungeonManager : MonoBehaviour
     [SerializeField] private bool debugTextoutput;
     [SerializeField] private Text debugOutput;
     [SerializeField] private bool createRooms = false;
+    [SerializeField] private BoxCollider2D raycastPlane;
+    [SerializeField] private bool LodActive = false;
 
     private Vector2Int startRoomPos;
     private int?[,] floorMap;
@@ -38,6 +40,7 @@ public class DungeonManager : MonoBehaviour
     void Start()
     {
         spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
+        raycastPlane.size = new Vector2(maxFloorSize.x * (aproxDistanceRoomsX + 1),maxFloorSize.y * (aproxDistanceRoomsY + 1));
 
         rand = new System.Random();
         if (useSeed)
@@ -85,6 +88,7 @@ public class DungeonManager : MonoBehaviour
             var room = Instantiate(startSpawnRoom, Vector3.zero, startSpawnRoom.transform.rotation, this.transform);
             spawnedFloor[floorSize.x / 2, floorSize.y / 2] = room.GetComponent<DungeonRoom>();
             spawnedFloor[floorSize.x / 2, floorSize.y / 2].SetRoomID(startRoomPos.x, startRoomPos.y);
+            spawnedFloor[floorSize.x / 2, floorSize.y / 2].SetLod(LodActive);
         }
 
         createSurroundingRooms(startRoomPos.x, startRoomPos.y);
@@ -139,6 +143,7 @@ public class DungeonManager : MonoBehaviour
 
         spawnedFloor[posX, posY] = room.GetComponent<DungeonRoom>();
         spawnedFloor[posX, posY].SetRoomID(x, y);
+        spawnedFloor[posX, posY].SetLod(LodActive);
     }
 
     Vector2 calculatePosition(int x, int y)

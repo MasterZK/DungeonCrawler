@@ -16,6 +16,7 @@ public class DungeonRoom : MonoBehaviour
 {
     [SerializeField] private float height, width = 0;
     [SerializeField] private DoorTeleporter[] doors = new DoorTeleporter[4];
+    [SerializeField] private LODGroup LodRenderGroup;
 
     private ID roomID;
     private DungeonManager dungeonManager;
@@ -35,6 +36,17 @@ public class DungeonRoom : MonoBehaviour
     void OnValidate()
     {
         adjustSize();
+    }
+    private void adjustSize()
+    {
+        var size = this.GetComponent<MeshCollider>().bounds.size;
+        height = size.y;
+        width = size.x;
+    }
+
+    public void SetLod(bool state)
+    {
+        LodRenderGroup.enabled = state;
     }
 
     public void setTeleporters()
@@ -74,13 +86,6 @@ public class DungeonRoom : MonoBehaviour
         return this.doors[doorIndex];
     }
 
-    private void adjustSize()
-    {
-        var size = this.GetComponent<MeshCollider>().bounds.size;
-        height = size.y;
-        width = size.x;
-    }
-
     public void SetRoomID(int xID, int yID)
     {
         roomID = new ID(xID, yID);
@@ -88,5 +93,5 @@ public class DungeonRoom : MonoBehaviour
     }
 
     public ID GetRoomID() => roomID;
-    
+
 }
