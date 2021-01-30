@@ -60,8 +60,8 @@
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\TimelineWindow_Breadcrumbs.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\treeview\Control.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Undo\ApplyDefaultUndoAttribute.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Actions\Invoker.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\CustomEditors\CustomTimelineEditorCache.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Actions\Invoker.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Manipulators\Utils\EditModeRippleUtils.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Actions\MarkerAction.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Manipulators\Utils\EditModeMixUtils.cs" />
@@ -148,8 +148,8 @@
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\PlaybackScroller.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\GUIGroupScope.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Utilities\AnimatedParameterUtility.cs" />
-    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\treeview\PickerUtils.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\TimelineWindow_Manipulators.cs" />
+    <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\treeview\PickerUtils.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\inspectors\ClipInspector\ClipInspectorCurveEditor.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Window\ViewModel\TimelineAssetViewModel.cs" />
     <Compile Include="Library\PackageCache\com.unity.timeline@1.4.5\Editor\Recording\TrackAssetRecordingExtensions.cs" />

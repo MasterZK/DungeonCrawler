@@ -65,6 +65,8 @@
     <Compile Include="Assets\Scripts\DungeonGenerator\RoomPrefabManager.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonManager.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonRoom.cs" />
+    <Compile Include="Assets\Scripts\Player\Weapon.cs" />
+    <Compile Include="Assets\Scripts\Player\ExplosionFlash.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
@@ -730,9 +732,9 @@
       <Project>{9BC7E115-42B0-2EE8-9B21-9DA42541DFE2}</Project>
       <Name>Unity.2D.Path.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.csproj">
-      <Project>{F20E3D8D-6586-4F64-DB98-F4B482601C37}</Project>
-      <Name>Unity.RenderPipelines.Core.Runtime</Name>
+    <ProjectReference Include="Unity.Postprocessing.Editor.csproj">
+      <Project>{82A81C19-B2B1-C77F-104C-3EC6831C9F9D}</Project>
+      <Name>Unity.Postprocessing.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.UI.csproj">
       <Project>{92A54EB6-96DA-3565-84B1-9A5154D6B8D3}</Project>
@@ -750,6 +752,10 @@
       <Project>{2A37DFA9-E617-EE69-F593-D3701C2E7448}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.csproj">
+      <Project>{F20E3D8D-6586-4F64-DB98-F4B482601C37}</Project>
+      <Name>Unity.RenderPipelines.Core.Runtime</Name>
+    </ProjectReference>
     <ProjectReference Include="Unity.InternalAPIEditorBridge.001.csproj">
       <Project>{C0AB57BA-1F99-ACB3-A117-C74625175E22}</Project>
       <Name>Unity.InternalAPIEditorBridge.001</Name>
@@ -765,6 +771,18 @@
     <ProjectReference Include="Unity.ShaderGraph.Editor.csproj">
       <Project>{0FAAA10E-3449-4C78-E5A9-7E564E1CF553}</Project>
       <Name>Unity.ShaderGraph.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Cinemachine.csproj">
+      <Project>{68A1A567-AB05-E009-80A6-C49BCDB360BC}</Project>
+      <Name>Cinemachine</Name>
+    </ProjectReference>
+    <ProjectReference Include="com.unity.cinemachine.editor.csproj">
+      <Project>{E9F2493F-BE79-D706-AA85-C86ED4B2787D}</Project>
+      <Name>com.unity.cinemachine.editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.Postprocessing.Runtime.csproj">
+      <Project>{DADFA029-E07D-33B2-EA2D-612EDE98AFD9}</Project>
+      <Name>Unity.Postprocessing.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Editor.csproj">
       <Project>{40E747CB-8190-9B70-11D2-91B4B0C63ADA}</Project>
@@ -817,22 +835,6 @@
     <ProjectReference Include="Unity.2D.SpriteShape.Runtime.csproj">
       <Project>{BD82C5C0-6C9F-927B-663B-45A75F093C60}</Project>
       <Name>Unity.2D.SpriteShape.Runtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.Postprocessing.Editor.csproj">
-      <Project>{82A81C19-B2B1-C77F-104C-3EC6831C9F9D}</Project>
-      <Name>Unity.Postprocessing.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.Postprocessing.Runtime.csproj">
-      <Project>{DADFA029-E07D-33B2-EA2D-612EDE98AFD9}</Project>
-      <Name>Unity.Postprocessing.Runtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="com.unity.cinemachine.editor.csproj">
-      <Project>{E9F2493F-BE79-D706-AA85-C86ED4B2787D}</Project>
-      <Name>com.unity.cinemachine.editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Cinemachine.csproj">
-      <Project>{68A1A567-AB05-E009-80A6-C49BCDB360BC}</Project>
-      <Name>Cinemachine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
