@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2000070880364234309}
   - component: {fileID: 2000070880364234308}
   - component: {fileID: 2000070880364234331}
+  - component: {fileID: 1265890438108907924}
   m_Layer: 9
   m_Name: WallParts
   m_TagString: Untagged
@@ -51,7 +52,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8f321fa0020d24e4b998233853000535, type: 2}
+  - {fileID: 2100000, guid: 7bee5ef8e76b7f54786d4957d809e619, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -73,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: db750325989564987a34393247d883b4, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -109,3 +110,29 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1265890438108907924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000070880364234329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 1
+  m_ApplyToSortingLayers: 00000000
+  m_ShapePath:
+  - {x: -0.5000107, y: -0.4883654, z: 0}
+  - {x: 0.49683353, y: -0.49378943, z: 0}
+  - {x: 0.49719656, y: 0.49122393, z: 0}
+  - {x: -0.50034845, y: 0.47986186, z: 0}
+  m_ShapePathHash: 304310444
+  m_Mesh: {fileID: 0}
+  m_InstanceId: 29506
