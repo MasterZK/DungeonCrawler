@@ -17,7 +17,7 @@ public class PlayerMovement2D : MonoBehaviour
     [SerializeField] private bool jumping = false;
     [SerializeField] public bool transitioning = false;
 
-    private Rigidbody2D playerRb2D;
+    private Rigidbody2D playerRb2D; 
     private Vector3 originalScale;
 
     void Start()
@@ -45,10 +45,13 @@ public class PlayerMovement2D : MonoBehaviour
     Vector2 checkPlayerInputH()
     {
         var horizontalInput = Input.GetAxisRaw("Horizontal") * Time.deltaTime * movementSpeed;
-        if (crouching)
-            horizontalInput *= crouchMultiplier;
 
-        playerRb2D.velocity = new Vector2(Mathf.Clamp(playerRb2D.velocity.x + horizontalInput,-movementSpeed * Time.deltaTime, movementSpeed * Time.deltaTime),playerRb2D.velocity.y);
+        playerRb2D.velocity = new Vector2(
+            Mathf.Clamp(playerRb2D.velocity.x + horizontalInput,-movementSpeed * Time.deltaTime, movementSpeed * Time.deltaTime),
+            playerRb2D.velocity.y);
+
+        if (crouching)
+            playerRb2D.velocity = new Vector2(playerRb2D.velocity.x * crouchMultiplier, playerRb2D.velocity.y);
 
         return Vector2.right * horizontalInput;
     }
@@ -101,7 +104,7 @@ public class PlayerMovement2D : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(this.transform.position, Vector2.down, Mathf.Infinity, layer);
         //grounded = Vector2.Distance(hit.point, this.transform.position) <= (this.GetComponent<Collider2D>().bounds.size.y * 0.6f);
         var distance = (hit.point - this.GetComponent<Rigidbody2D>().position).magnitude;
-        grounded = distance > 0 && distance <= (this.GetComponent<Collider2D>().bounds.size.y * 0.6f);
+        grounded = distance > 0 && distance <= (this.GetComponent<Collider2D>().bounds.size.y * 0.55f);
 
         return grounded;
     }
