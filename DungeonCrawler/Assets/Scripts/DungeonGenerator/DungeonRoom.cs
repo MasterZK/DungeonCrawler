@@ -39,7 +39,7 @@ public class DungeonRoom : MonoBehaviour
     }
     private void adjustSize()
     {
-        var size = this.GetComponent<MeshCollider>().bounds.size;
+        var size = this.GetComponent<Collider2D>().bounds.size;
         height = size.y;
         width = size.x;
     }

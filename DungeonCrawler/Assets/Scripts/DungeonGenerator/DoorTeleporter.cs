@@ -59,17 +59,20 @@ public class DoorTeleporter : MonoBehaviour
             if (other.gameObject.GetComponent<PlayerMovement2D>().transitioning)
                 return;
 
-            StartCoroutine(ScreenFade());
+            if (screenFader)
+                StartCoroutine(ScreenFade());
             StartCoroutine(MovePlayer(other));
         }
     }
 
     IEnumerator MovePlayer(Collider2D player)
     {
+        player.GetComponent<Collider2D>().isTrigger = true;
         player.GetComponent<PlayerMovement2D>().transitioning = true;
         var tween = player.GetComponent<Rigidbody2D>().DOMove(destinationPosition, transitionSpeed);
         yield return tween.WaitForCompletion();
         player.GetComponent<PlayerMovement2D>().transitioning = false;
+        player.GetComponent<Collider2D>().isTrigger = false;
     }
 
     IEnumerator ScreenFade()

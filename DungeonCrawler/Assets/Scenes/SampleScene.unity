@@ -446,6 +446,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 68973213, guid: f5f22868f15c1414a97fb0edc1d88ef7, type: 3}
+      propertyPath: m_Intensity
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 1773891526770893412, guid: f5f22868f15c1414a97fb0edc1d88ef7, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -496,7 +500,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1773891526770893415, guid: f5f22868f15c1414a97fb0edc1d88ef7, type: 3}
       propertyPath: orthographic size
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1773891526770893417, guid: f5f22868f15c1414a97fb0edc1d88ef7, type: 3}
       propertyPath: m_Name
@@ -626,21 +630,17 @@ PrefabInstance:
       value: FloorGenerator
       objectReference: {fileID: 0}
     - target: {fileID: 8498209692391531397, guid: 9160a80e71409924698d9e713b351769, type: 3}
+      propertyPath: LodActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8498209692391531397, guid: 9160a80e71409924698d9e713b351769, type: 3}
       propertyPath: debugOutput
       value: 
       objectReference: {fileID: 81666441}
     - target: {fileID: 8498209692391531397, guid: 9160a80e71409924698d9e713b351769, type: 3}
-      propertyPath: floorDensity
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8498209692391531397, guid: 9160a80e71409924698d9e713b351769, type: 3}
-      propertyPath: maxRoomsSpawned
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 8498209692391531397, guid: 9160a80e71409924698d9e713b351769, type: 3}
-      propertyPath: minRoomsSpawned
-      value: 10
-      objectReference: {fileID: 0}
+      propertyPath: startSpawnRoom
+      value: 
+      objectReference: {fileID: 2284654194959472384, guid: d4f3433fffe49344f8b99e81194bda1c, type: 3}
     - target: {fileID: 8498209692391531403, guid: 9160a80e71409924698d9e713b351769, type: 3}
       propertyPath: m_RootOrder
       value: 1

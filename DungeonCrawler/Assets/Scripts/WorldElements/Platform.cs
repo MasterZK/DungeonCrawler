@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -6,6 +5,7 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
+    [SerializeField] private bool transitionPlatform = false;
 
     private void OnCollisionStay2D(Collision2D other)
     {
@@ -21,10 +21,12 @@ public class Platform : MonoBehaviour
     {
         player.GetComponent<Collider2D>().isTrigger = true;
         Vector3 currentVelocity = player.velocity.normalized;
-        var move = player.DOMove(player.transform.position + 
+        var move = player.DOMove(player.transform.position +
                                  (Vector3.down + currentVelocity) * this.GetComponent<BoxCollider2D>().size.y, 0.1f);
         yield return move.WaitForCompletion();
-        player.GetComponent<Collider2D>().isTrigger = false;
+
+        if (!transitionPlatform)
+            player.GetComponent<Collider2D>().isTrigger = false;
     }
 
 }
