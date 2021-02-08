@@ -58,15 +58,16 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\DungeonGenerator\DoorTeleporter.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerAttributes.cs" />
+    <Compile Include="Assets\Scripts\Player\Weapon.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMovement2D.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\CameraRepositioner.cs" />
     <Compile Include="Assets\Scripts\Player\WeaponController.cs" />
     <Compile Include="Assets\Scripts\WorldElements\Platform.cs" />
+    <Compile Include="Assets\Scripts\Player\ExplosionFlash.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\RoomPrefabManager.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonManager.cs" />
     <Compile Include="Assets\Scripts\DungeonGenerator\DungeonRoom.cs" />
-    <Compile Include="Assets\Scripts\Player\Weapon.cs" />
-    <Compile Include="Assets\Scripts\Player\ExplosionFlash.cs" />
+    <Compile Include="Assets\Scripts\WorldElements\HoverObject.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

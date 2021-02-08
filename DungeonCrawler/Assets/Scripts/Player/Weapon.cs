@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Cinemachine;
-using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
 
 public class Weapon : MonoBehaviour
 {
@@ -15,6 +13,7 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         part = GetComponent<ParticleSystem>();
+        screenShake = GameObject.FindObjectOfType<CinemachineImpulseSource>();
     }
 
     void OnParticleCollision(GameObject other)
