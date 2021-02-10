@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public struct ID
@@ -18,6 +19,8 @@ public class DungeonRoom : MonoBehaviour
     [SerializeField] private DoorTeleporter[] doors = new DoorTeleporter[4];
     [SerializeField] private LODGroup LodRenderGroup;
 
+    public DungeonRoomAStar aStarRoom;
+
     private ID roomID;
     private DungeonManager dungeonManager;
 
@@ -27,21 +30,21 @@ public class DungeonRoom : MonoBehaviour
         adjustSize();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     void OnValidate()
     {
         adjustSize();
     }
-    private void adjustSize()
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        var size = this.GetComponent<Collider2D>().bounds.size;
-        height = size.y;
-        width = size.x;
+        Camera.main.transform.SetPositionAndRotation(this.transform.position + new Vector3(0, 0, -10), Quaternion.identity);
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        //TODO
+        //disable adjacent rooms and itself when room is left to avoid unnecessary updates 
+        throw new NotImplementedException();
     }
 
     public void SetLod(bool state)
@@ -51,28 +54,28 @@ public class DungeonRoom : MonoBehaviour
 
     public void setTeleporters()
     {
-        var result = dungeonManager.getRoomByID(roomID.x - 1, roomID.y);
+        var result = dungeonManager.GetRoomByID(roomID.x - 1, roomID.y);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(1);
             doors[3].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.getRoomByID(roomID.x + 1, roomID.y);
+        result = dungeonManager.GetRoomByID(roomID.x + 1, roomID.y);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(3);
             doors[1].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.getRoomByID(roomID.x, roomID.y - 1);
+        result = dungeonManager.GetRoomByID(roomID.x, roomID.y - 1);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(0);
             doors[2].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.getRoomByID(roomID.x, roomID.y + 1);
+        result = dungeonManager.GetRoomByID(roomID.x, roomID.y + 1);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(2);
@@ -94,4 +97,10 @@ public class DungeonRoom : MonoBehaviour
 
     public ID GetRoomID() => roomID;
 
+    private void adjustSize()
+    {
+        var size = this.GetComponent<Collider2D>().bounds.size;
+        height = size.y;
+        width = size.x;
+    }
 }
