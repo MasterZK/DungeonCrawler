@@ -2,9 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
+
+public struct ID
+{
+    public int x { get; }
+    public int y { get; }
+
+    public ID(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static ID operator -(ID valueOne, ID valueTwo) => new ID(valueOne.x - valueTwo.x, valueOne.y - valueTwo.y);
+
+    public static ID operator -(ID valueOne, Vector2Int valueTwo) => new ID(valueOne.x - valueTwo.x, valueOne.y - valueTwo.y);
+
+    public static ID operator +(ID valueOne, ID valueTwo) => new ID(valueOne.x + valueTwo.x, valueOne.y + valueTwo.y);
+
+    public static ID operator +(ID valueOne, Vector2Int valueTwo) => new ID(valueOne.x + valueTwo.x, valueOne.y + valueTwo.y);
+
+    public static bool operator ==(ID valueOne, ID valueTwo) => (valueOne.x == valueTwo.x) && (valueOne.y == valueTwo.y);
+
+    public static bool operator !=(ID valueOne, ID valueTwo) => (valueOne.x != valueTwo.x) || (valueOne.y != valueTwo.y);
+}
+
+public struct RoomType
+{
+
+}
 
 /// <summary>
 /// Manages the generation of a dungeon floors
@@ -28,12 +56,12 @@ public class DungeonManager : MonoBehaviour
     [SerializeField] private GameObject startSpawnRoom;
 
     [Header("Debug")]
-    [SerializeField] private bool debugTextoutput = false;
-    [SerializeField] private bool createAstar = false;
-    [SerializeField] private Text debugOutput;
-    [SerializeField] private bool createRooms = false;
-    [SerializeField] private BoxCollider2D raycastPlane;
     [SerializeField] private bool LodActive = false;
+    [SerializeField] private bool createRooms = false;
+    [SerializeField] private bool createAstar = false;
+    [SerializeField] private bool debugTextoutput = false;
+    [SerializeField] private Text debugOutput;
+    [SerializeField] private BoxCollider2D raycastPlane;
 
     private Vector2Int startRoomPos;
     [ItemCanBeNull] private int?[,] floorMap;
@@ -47,7 +75,9 @@ public class DungeonManager : MonoBehaviour
     {
         spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
         raycastPlane.size = new Vector2(maxFloorSize.x * (aproxDistanceRoomsX + 1), maxFloorSize.y * (aproxDistanceRoomsY + 1));
-        createAstar = createRooms;
+
+        if (createRooms)
+            createAstar = createRooms;
 
         rand = new System.Random();
         if (useSeed)
@@ -116,7 +146,7 @@ public class DungeonManager : MonoBehaviour
         if (spawnedRooms == maxRoomsSpawned)
             return;
 
-        floorMap[roomPosX, roomPosY] = chooseRandom(0, rand.Next(1, spawnableRooms.GetLength(0) + 1), floorDensity);
+        floorMap[roomPosX, roomPosY] = chooseRandom(0, 1, floorDensity);
 
         if (floorMap[roomPosX, roomPosY] != 0)
         {
@@ -151,6 +181,7 @@ public class DungeonManager : MonoBehaviour
                     spawnedFloorAStar[x, y].SetRoomID(x, y);
                 }
 
+
         for (int x = 0; x < maxFloorSize.x; x++)
             for (int y = 0; y < maxFloorSize.y; y++)
                 calculateAStar(new ID(x, y), new ID(maxFloorSize.x / 2, maxFloorSize.y / 2));
@@ -174,7 +205,7 @@ public class DungeonManager : MonoBehaviour
             current = openList[0];
             openList.Remove(current);
             closedList.Add(current);
-            adjacentRooms = getAdjacentNodes(current);
+            adjacentRooms = getAdjacentRooms(current);
 
             foreach (var neighbor in adjacentRooms)
             {
@@ -214,7 +245,7 @@ public class DungeonManager : MonoBehaviour
 
     }
 
-    private List<DungeonRoomAStar> getAdjacentNodes(DungeonRoomAStar room)
+    private List<DungeonRoomAStar> getAdjacentRooms(DungeonRoomAStar room)
     {
         List<DungeonRoomAStar> temp = new List<DungeonRoomAStar>();
 
@@ -253,7 +284,7 @@ public class DungeonManager : MonoBehaviour
 
         for (int x = 0; x < maxFloorSize.x; x++)
             for (int y = 0; y < maxFloorSize.y; y++)
-                if (floorMap[x, y] != null || floorMap[x, y] != 0)
+                if (floorMap[x, y] != null && floorMap[x, y] != 0)
                     createDungeonRoom(x, y, floorMap[x, y].Value);
 
     }
@@ -265,13 +296,16 @@ public class DungeonManager : MonoBehaviour
         if (roomType == 9)
             room = Instantiate(startSpawnRoom, calculatePosition(x, y),
                 startSpawnRoom.transform.rotation, this.transform);
-
-        room = Instantiate(spawnableRooms[roomType - 1], calculatePosition(x, y),
-            spawnableRooms[roomType - 1].transform.rotation, this.transform);
+        else
+            room = Instantiate(spawnableRooms[roomType - 1], calculatePosition(x, y),
+                spawnableRooms[roomType - 1].transform.rotation, this.transform);
 
         spawnedFloor[x, y] = room.GetComponent<DungeonRoom>();
         spawnedFloor[x, y].SetRoomID(x, y);
         spawnedFloor[x, y].SetLod(LodActive);
+
+        if (roomType != 9)
+            spawnedFloor[x, y].gameObject.SetActive(false);
     }
 
     int checkNeighborCount(int x, int y)
@@ -323,8 +357,12 @@ public class DungeonManager : MonoBehaviour
         return null;
     }
 
-    public Vector2Int GetFloorSize() => maxFloorSize;
+    public DungeonRoom GetRoomByID(ID roomID)
+    {
+        return GetRoomByID(roomID.x, roomID.y);
+    }
 
+    public Vector2Int GetFloorSize() => maxFloorSize;
 
     void printMapAsText()
     {
@@ -342,6 +380,9 @@ public class DungeonManager : MonoBehaviour
             }
         }
 
+        if (!createAstar)
+            return;
+
         debugOutput.text += "\n Astar map";
 
         for (int i = 0; i < maxFloorSize.x; i++)
@@ -356,6 +397,5 @@ public class DungeonManager : MonoBehaviour
             }
         }
     }
-
 
 }

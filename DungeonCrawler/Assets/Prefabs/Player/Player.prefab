@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 451836140337530449}
   - component: {fileID: 451836140337530448}
   - component: {fileID: 451836140337530455}
-  - component: {fileID: 451836140337530451}
   - component: {fileID: 451836139574973435}
+  - component: {fileID: 451836140337530451}
+  - component: {fileID: 5013992074407076989}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -133,28 +134,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &451836140337530451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 451836140337530454}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3963af16ff184e458c1550387b0e16b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementSpeed: 200
-  deaccelerationMultiplier: 0.05
-  crouchMultiplier: 0.5
-  jumpVelocity: 500
-  jumpMultiplier: 1
-  fallMultiplier: 2
-  crouching: 0
-  grounded: 1
-  jumping: 0
-  transitioning: 0
 --- !u!114 &451836139574973435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,4 +159,42 @@ MonoBehaviour:
   - {x: -0.5, y: 0.5, z: 0}
   m_ShapePathHash: 0
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1262
+  m_InstanceId: -20780
+--- !u!114 &451836140337530451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451836140337530454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3963af16ff184e458c1550387b0e16b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeed: 200
+  deaccelerationMultiplier: 0.05
+  crouchMultiplier: 0.5
+  jumpVelocity: 500
+  jumpMultiplier: 1
+  fallMultiplier: 2
+  crouching: 0
+  grounded: 1
+  jumping: 0
+  transitioning: 0
+--- !u!114 &5013992074407076989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451836140337530454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75c87a2b8fa259841823f1c876c5dd77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 100
+  maxHealth: 100
+  healthBar: {fileID: 0}
+  healthText: {fileID: 0}

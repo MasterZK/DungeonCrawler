@@ -1,26 +1,13 @@
 using System;
 using UnityEngine;
 
-public struct ID
-{
-    public int x { get; }
-    public int y { get; }
-
-    public ID(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-}
-
 public class DungeonRoom : MonoBehaviour
 {
     [SerializeField] private float height, width = 0;
     [SerializeField] private DoorTeleporter[] doors = new DoorTeleporter[4];
     [SerializeField] private LODGroup LodRenderGroup;
 
-    public DungeonRoomAStar aStarRoom;
-
+    private RoomType roomType;
     private ID roomID;
     private DungeonManager dungeonManager;
 
@@ -37,14 +24,43 @@ public class DungeonRoom : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!other.CompareTag("Player"))
+            return;
+
         Camera.main.transform.SetPositionAndRotation(this.transform.position + new Vector3(0, 0, -10), Quaternion.identity);
+
+        var previousRoom = other.GetComponent<PlayerAttributes>().CurrentRoom;
+        setNeighborRooms(previousRoom,false);
+        setNeighborRooms(this.roomID, true);
+        other.GetComponent<PlayerAttributes>().CurrentRoom = this.roomID;
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void setNeighborRooms(ID room, bool state)
     {
-        //TODO
-        //disable adjacent rooms and itself when room is left to avoid unnecessary updates 
-        throw new NotImplementedException();
+        DungeonRoom tempRoom = null;
+        if (!(room + Vector2Int.down == this.roomID))
+            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.down);
+
+        if (tempRoom != null)
+            tempRoom.gameObject.SetActive(state);
+
+        if (!(room + Vector2Int.up == this.roomID))
+            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.up);
+
+        if (tempRoom != null)
+            tempRoom.gameObject.SetActive(state);
+
+        if (!(room + Vector2Int.right == this.roomID))
+            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.right);
+
+        if (tempRoom != null)
+            tempRoom.gameObject.SetActive(state);
+
+        if (!(room + Vector2Int.left == this.roomID))
+            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.left);
+
+        if (tempRoom != null)
+            tempRoom.gameObject.SetActive(state);
     }
 
     public void SetLod(bool state)
@@ -96,6 +112,10 @@ public class DungeonRoom : MonoBehaviour
     }
 
     public ID GetRoomID() => roomID;
+
+    public void SetRoomType(RoomType newType) => roomType = newType;
+
+    public RoomType GetRoomType() => roomType;
 
     private void adjustSize()
     {

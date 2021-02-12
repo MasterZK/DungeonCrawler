@@ -1,6 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerAttributes))]
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Player Attributes")]
