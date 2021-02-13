@@ -2,10 +2,11 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 
-
 public class Platform : MonoBehaviour
 {
     [SerializeField] private bool transitionPlatform = false;
+
+    public bool GetPlatformType() => transitionPlatform;
 
     private void OnCollisionStay2D(Collision2D other)
     {

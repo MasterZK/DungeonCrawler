@@ -30,12 +30,19 @@ public class PlayerMovement2D : MonoBehaviour
 
     void Update()
     {
+        if (transitioning)
+            return;
+
         checkJumpInput();
     }
 
     void FixedUpdate()
     {
         checkGrounded();
+
+        if (transitioning)
+            return;
+
         groundPlayer();
         checkPlayerInputH();
         playerVelocityCancel();

@@ -30,34 +30,24 @@ public class DungeonRoom : MonoBehaviour
         Camera.main.transform.SetPositionAndRotation(this.transform.position + new Vector3(0, 0, -10), Quaternion.identity);
 
         var previousRoom = other.GetComponent<PlayerAttributes>().CurrentRoom;
-        setNeighborRooms(previousRoom,false);
+        setNeighborRooms(previousRoom, false);
         setNeighborRooms(this.roomID, true);
         other.GetComponent<PlayerAttributes>().CurrentRoom = this.roomID;
     }
 
     private void setNeighborRooms(ID room, bool state)
     {
-        DungeonRoom tempRoom = null;
-        if (!(room + Vector2Int.down == this.roomID))
-            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.down);
+        setRoom(room + Vector2Int.down, state);
+        setRoom(room + Vector2Int.up, state);
+        setRoom(room + Vector2Int.right, state);
+        setRoom(room + Vector2Int.left, state);
+    }
 
-        if (tempRoom != null)
-            tempRoom.gameObject.SetActive(state);
-
-        if (!(room + Vector2Int.up == this.roomID))
-            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.up);
-
-        if (tempRoom != null)
-            tempRoom.gameObject.SetActive(state);
-
-        if (!(room + Vector2Int.right == this.roomID))
-            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.right);
-
-        if (tempRoom != null)
-            tempRoom.gameObject.SetActive(state);
-
-        if (!(room + Vector2Int.left == this.roomID))
-            tempRoom = dungeonManager.GetRoomByID(room + Vector2Int.left);
+    private void setRoom(ID room, bool state)
+    {
+        DungeonRoom? tempRoom = null;
+        if (!(room == this.roomID))
+            tempRoom = dungeonManager.GetRoomByID(room);
 
         if (tempRoom != null)
             tempRoom.gameObject.SetActive(state);

@@ -33,7 +33,7 @@ public class HoverObject : MonoBehaviour
     void hover()
     {
         hoverPos = startPos;
-        hoverPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * hoverSpeed) * hoverDistance;
+        hoverPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * hoverSpeed) * hoverDistance + hoverDistance;
 
         transform.position = hoverPos;
     }

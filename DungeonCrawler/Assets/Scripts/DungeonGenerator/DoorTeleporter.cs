@@ -11,42 +11,37 @@ public class DoorTeleporter : MonoBehaviour
     [SerializeField] private float transitionSpeed = 0.40f;
     [SerializeField] private GameObject connectedPlatform;
 
-    private Effector2D platformEffector2D;
-    private Collider2D collider;
-
-    void Awake()
+    void Start()
     {
         screenFader = GameObject.Find("ScreenFade").GetComponent<Image>();
-        collider = this.GetComponent<Collider2D>();
 
-        if (connectedPlatform)
-            platformEffector2D = connectedPlatform.GetComponent<Effector2D>();
+        if (connectedPlatform.GetComponent<Platform>().GetPlatformType() && destinationPosition == Vector3.zero)
+        {
+            this.GetComponent<Collider2D>().isTrigger = false;
+            connectedPlatform.GetComponent<Effector2D>().enabled = false;
+                Destroy(connectedPlatform.GetComponent<Platform>());
+        }
     }
 
     void Update()
     {
-        collider.isTrigger = true;
-        if (connectedPlatform)
+        if (destinationPosition != Vector3.zero && !connectedPlatform.GetComponent<Platform>())
         {
-            platformEffector2D.enabled = true;
+            this.GetComponent<Collider2D>().isTrigger = true;
+            connectedPlatform.GetComponent<Effector2D>().enabled = true;
             if (!connectedPlatform.GetComponent<Platform>())
                 connectedPlatform.AddComponent<Platform>();
-        }
-
-        if (destinationPosition == Vector3.zero)
-        {
-            collider.isTrigger = false;
-            if (connectedPlatform)
-            {
-                platformEffector2D.enabled = false;
-                Destroy(connectedPlatform.GetComponent<Platform>());
-            }
         }
     }
 
     public void SetTeleportDestination(Vector3 destination)
     {
         destinationPosition = destination;
+
+        this.GetComponent<Collider2D>().isTrigger = true;
+        connectedPlatform.GetComponent<Effector2D>().enabled = true;
+        if (!connectedPlatform.GetComponent<Platform>())
+            connectedPlatform.AddComponent<Platform>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -73,6 +68,7 @@ public class DoorTeleporter : MonoBehaviour
         yield return tween.WaitForCompletion();
         player.GetComponent<PlayerMovement2D>().transitioning = false;
         player.GetComponent<Collider2D>().isTrigger = false;
+        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
     }
 
     IEnumerator ScreenFade()
