@@ -1,0 +1,3 @@
+http://www.drpetter.se/project_sfxr.html
+
+Source code is available and you're free to use it for anything you please. I've put it under the MIT free software license.
