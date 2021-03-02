@@ -58,7 +58,6 @@ public class WeaponController : MonoBehaviour
     {
         adjustWeaponDirection();
         shootProjectile();
-
     }
 
     void initWeaponStats()
@@ -78,7 +77,16 @@ public class WeaponController : MonoBehaviour
         weaponPresets.Add(WeaponType.Automatic,newWeapon);
 
         //shotgun
+        newWeapon.automatic = false;
+        newWeapon.projectileRange = 0.3f;
+        newWeapon.projectileSpeed = 40;
+        newWeapon.fallOff = 1.2f;
 
+        newWeapon.bulletsPerShot = 6;
+        newWeapon.fireRate = 1;
+        newWeapon.accuracy = 30;
+
+        weaponPresets.Add(WeaponType.Shotgun, newWeapon);
 
     }
 
@@ -101,6 +109,7 @@ public class WeaponController : MonoBehaviour
         var burst = projectiles.emission.GetBurst(0);
         burst.maxCount = burst.minCount = newWeaponStats.bulletsPerShot;
         burst.repeatInterval = newWeaponStats.fireRate;
+        projectiles.emission.SetBurst(0,burst);
 
         var shape = projectiles.shape;
         shape.arc = newWeaponStats.accuracy;
