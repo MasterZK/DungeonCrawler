@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 [RequireComponent( typeof(BoxCollider2D))]
@@ -33,7 +34,7 @@ public class HoverObject : MonoBehaviour
     void hover()
     {
         hoverPos = startPos;
-        hoverPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * hoverSpeed) * hoverDistance + hoverDistance;
+        hoverPos.y += math.sin(Time.fixedTime * math.PI * hoverSpeed) * hoverDistance + hoverDistance;
 
         transform.position = hoverPos;
     }

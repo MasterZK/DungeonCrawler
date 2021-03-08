@@ -2,32 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UI;
-
-public struct ID
-{
-    public int x { get; }
-    public int y { get; }
-
-    public ID(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-
-    public static ID operator -(ID valueOne, ID valueTwo) => new ID(valueOne.x - valueTwo.x, valueOne.y - valueTwo.y);
-
-    public static ID operator -(ID valueOne, Vector2Int valueTwo) => new ID(valueOne.x - valueTwo.x, valueOne.y - valueTwo.y);
-
-    public static ID operator +(ID valueOne, ID valueTwo) => new ID(valueOne.x + valueTwo.x, valueOne.y + valueTwo.y);
-
-    public static ID operator +(ID valueOne, Vector2Int valueTwo) => new ID(valueOne.x + valueTwo.x, valueOne.y + valueTwo.y);
-
-    public static bool operator ==(ID valueOne, ID valueTwo) => (valueOne.x == valueTwo.x) && (valueOne.y == valueTwo.y);
-
-    public static bool operator !=(ID valueOne, ID valueTwo) => (valueOne.x != valueTwo.x) || (valueOne.y != valueTwo.y);
-}
+using Unity.Mathematics;
 
 public struct RoomType
 {
@@ -43,12 +23,15 @@ public class DungeonManager : MonoBehaviour
     [Header("Floor Settings")]
     [SerializeField] private int seed;
     [SerializeField] private bool useSeed = true;
+
+    [Range(0.0f, 1.0f)]
+    [SerializeField] private float floorDensity = 0.5f;
+    [SerializeField] private int2 maxFloorSize;
     [SerializeField] private int minRoomsSpawned;
     [SerializeField] private int maxRoomsSpawned;
-    [SerializeField] private float floorDensity = 0.5f;
-    [SerializeField] private Vector2Int maxFloorSize;
-    [SerializeField] private int aproxDistanceRoomsX = 10;
-    [SerializeField] private int aproxDistanceRoomsY = 10;
+
+    [SerializeField] private int approxDistanceRoomsX = 25;
+    [SerializeField] private int approxDistanceRoomsY = 15;
 
     [Header("RoomPrefabs")]
     [SerializeField] private RoomPrefabManager prefabManager;
@@ -56,64 +39,80 @@ public class DungeonManager : MonoBehaviour
     [SerializeField] private GameObject startSpawnRoom;
 
     [Header("Debug")]
-    [SerializeField] private bool LodActive = false;
-    [SerializeField] private bool createRooms = false;
+    [SerializeField] private BoxCollider2D raycastPlane;
     [SerializeField] private bool createAstar = false;
+    [SerializeField] private bool createRooms = false;
+
+    [SerializeField] private bool LodActive = false;
+    [SerializeField] private bool debugSetActive = false;
+
     [SerializeField] private bool debugTextoutput = false;
     [SerializeField] private Text debugOutput;
-    [SerializeField] private BoxCollider2D raycastPlane;
 
-    private Vector2Int startRoomPos;
-    [ItemCanBeNull] private int?[,] floorMap;
-    [ItemCanBeNull] private DungeonRoomAStar[,] spawnedFloorAStar;
-    [ItemCanBeNull] private DungeonRoom[,] spawnedFloor;
+    private DungeonGrid dungeonFloor;
+
     private int spawnedRooms = 0;
     private Stack<Vector2Int> spawnBuffer = new Stack<Vector2Int>();
     private System.Random rand;
 
+    private List<DungeonRoomAStar> spawneDungeonRoomAStars;
+    [ItemCanBeNull] private DungeonRoom[,] spawnedFloor;
+
     void Start()
     {
-        spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
-        raycastPlane.size = new Vector2(maxFloorSize.x * (aproxDistanceRoomsX + 1), maxFloorSize.y * (aproxDistanceRoomsY + 1));
+        float startTime = Time.realtimeSinceStartup;
 
-        if (createRooms)
-            createAstar = createRooms;
+        spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
+        raycastPlane.size = new Vector2(maxFloorSize.x * (approxDistanceRoomsX + 1), maxFloorSize.y * (approxDistanceRoomsY + 1));
 
         rand = new System.Random();
         if (useSeed)
             rand = new System.Random(seed);
 
+        if (createRooms)
+            createAstar = createRooms;
+
         do
         {
-            spawnFloorMath(maxFloorSize);
+            spawnFloorMath();
         } while (spawnedRooms <= minRoomsSpawned);
 
-        if (createAstar)
-            createAstarFloor();
+        //if (createAstar)
+        //    createAstarFloorJob();
 
         if (createRooms)
+        {
             createFloor();
 
-        if (createRooms)
             foreach (var room in spawnedFloor)
                 if (room != null)
                     room.setTeleporters();
+        }
+
+        Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
 
         if (debugTextoutput)
             printMapAsText();
     }
 
-    void spawnFloorMath(Vector2Int floorSize)
+    private void OnDestroy()
+    {
+        dungeonFloor.Dispose();
+    }
+
+    void spawnFloorMath()
     {
         spawnedRooms = 0;
-        floorMap = new int?[floorSize.x, floorSize.y];
-        spawnedFloor = new DungeonRoom[floorSize.x, floorSize.y];
+        if (minRoomsSpawned >= maxRoomsSpawned)
+            minRoomsSpawned = maxRoomsSpawned - 10;
 
-        startRoomPos = new Vector2Int(floorSize.x / 2, floorSize.y / 2);
-        floorMap[floorSize.x / 2, floorSize.y / 2] = 9;
+        dungeonFloor = new DungeonGrid(maxFloorSize, seed, useSeed);
+
+        var startID = dungeonFloor.startRoomPos;
+        dungeonFloor.floorMap[dungeonFloor.IDToIndex(startID)] = new DungeonRoomAStar(startID, false);
         spawnedRooms++;
 
-        createSurroundingRooms(startRoomPos.x, startRoomPos.y);
+        createSurroundingRooms(startID.x, startID.y);
     }
 
     void createSurroundingRooms(int roomPosX, int roomPosY)
@@ -121,16 +120,16 @@ public class DungeonManager : MonoBehaviour
         if (spawnedRooms >= maxRoomsSpawned)
             return;
 
-        if (roomPosX - 1 >= 0 && floorMap[roomPosX - 1, roomPosY] == null)
+        if (roomPosX - 1 >= 0 && !dungeonFloor.floorMap[dungeonFloor.IDToIndex(roomPosX - 1, roomPosY)].created)
             createRoom(roomPosX - 1, roomPosY);
 
-        if (roomPosX + 1 <= maxFloorSize.x - 1 && floorMap[roomPosX + 1, roomPosY] == null)
+        if (roomPosX + 1 <= maxFloorSize.x - 1 && !dungeonFloor.floorMap[dungeonFloor.IDToIndex(roomPosX + 1, roomPosY)].created)
             createRoom(roomPosX + 1, roomPosY);
 
-        if (roomPosY - 1 >= 0 && floorMap[roomPosX, roomPosY - 1] == null)
+        if (roomPosY - 1 >= 0 && !dungeonFloor.floorMap[dungeonFloor.IDToIndex(roomPosX, roomPosY - 1)].created)
             createRoom(roomPosX, roomPosY - 1);
 
-        if (roomPosY + 1 <= maxFloorSize.y - 1 && floorMap[roomPosX, roomPosY + 1] == null)
+        if (roomPosY + 1 <= maxFloorSize.y - 1 && !dungeonFloor.floorMap[dungeonFloor.IDToIndex(roomPosX, roomPosY + 1)].created)
             createRoom(roomPosX, roomPosY + 1);
 
         while (spawnBuffer.Count != 0)
@@ -138,142 +137,414 @@ public class DungeonManager : MonoBehaviour
             var nextRoom = spawnBuffer.Pop();
             createSurroundingRooms(nextRoom.x, nextRoom.y);
         }
-
     }
 
     void createRoom(int roomPosX, int roomPosY)
     {
-        if (spawnedRooms == maxRoomsSpawned)
+        if (spawnedRooms >= maxRoomsSpawned)
             return;
 
-        floorMap[roomPosX, roomPosY] = chooseRandom(0, 1, floorDensity);
+        var index = dungeonFloor.IDToIndex(roomPosX, roomPosY);
+        dungeonFloor.floorMap[index] = CreateRoom(roomPosX, roomPosY, floorDensity);
 
-        if (floorMap[roomPosX, roomPosY] != 0)
+        if (!dungeonFloor.floorMap[index].Null && dungeonFloor.floorMap[index].created)
         {
-            spawnedRooms++;
             spawnBuffer.Push(new Vector2Int(roomPosX, roomPosY));
+            spawnedRooms++;
         }
     }
 
-    int chooseRandom(int valueOne, int valueTwo, float chance, bool useUnity = false)
+    public DungeonRoomAStar CreateRoom(ID roomID, float chance)
     {
-        chance = chance * 10;
+        var result = ChooseRandom(0, 1, chance);
+        Debug.Log(result);
 
-        UnityEngine.Random.InitState(seed);
-        if (UnityEngine.Random.Range(1, 11) > chance && useUnity)
-            return valueOne;
 
+        return new DungeonRoomAStar(roomID, result != 1);
+    }
+
+    public DungeonRoomAStar CreateRoom(int x, int y, float chance) => CreateRoom(new ID(x, y), chance);
+
+    public int ChooseRandom(int valueOne, int valueTwo, float chance)
+    {
+        chance *= 10;
         if (rand.Next(1, 11) > chance)
             return valueOne;
 
         return valueTwo;
     }
 
-    void createAstarFloor()
+    /*
+    void createAstarFloorJob()
     {
-        spawnedFloorAStar = new DungeonRoomAStar[maxFloorSize.x, maxFloorSize.y];
+        spawneDungeonRoomAStars = new List<DungeonRoomAStar>(spawnedRooms);
+        NativeHashMap<ID, DungeonRoomAStar> aStarHashMap = new NativeHashMap<ID, DungeonRoomAStar>(spawnedRooms, Allocator.Persistent);
 
-        for (int x = 0; x < maxFloorSize.x; x++)
-            for (int y = 0; y < maxFloorSize.y; y++)
-                if (floorMap[x, y] != null && floorMap[x, y] != 0)
-                {
-                    spawnedFloorAStar[x, y] = new DungeonRoomAStar();
-                    spawnedFloorAStar[x, y].SetRoomID(x, y);
-                }
-
-
-        for (int x = 0; x < maxFloorSize.x; x++)
-            for (int y = 0; y < maxFloorSize.y; y++)
-                calculateAStar(new ID(x, y), new ID(maxFloorSize.x / 2, maxFloorSize.y / 2));
-
-    }
-
-    Stack<DungeonRoomAStar> calculateAStar(ID destination, ID start, bool returnShortest = false)
-    {
-        Stack<DungeonRoomAStar> path = new Stack<DungeonRoomAStar>();
-        List<DungeonRoomAStar> openList = new List<DungeonRoomAStar>();
-        List<DungeonRoomAStar> closedList = new List<DungeonRoomAStar>();
-        List<DungeonRoomAStar> adjacentRooms;
-        DungeonRoomAStar current = spawnedFloorAStar[start.x, start.y];
-        var destinationPos = calculatePosition(destination.x, destination.y);
-
-        // add start node to Open List
-        openList.Add(spawnedFloorAStar[start.x, start.y]);
-
-        while (openList.Count != 0 && !closedList.Exists(x => x == spawnedFloorAStar[destination.x, destination.y]))
+        for (int index = 0; index < maxFloorSize.x * maxFloorSize.y; index++)
         {
-            current = openList[0];
-            openList.Remove(current);
-            closedList.Add(current);
-            adjacentRooms = getAdjacentRooms(current);
+            var id = IndexToID(index);
 
-            foreach (var neighbor in adjacentRooms)
+            if (floorMap[id.X, id.Y] != null && floorMap[id.X, id.Y] != 0)
             {
-                if (!closedList.Contains(neighbor))
-                {
-                    if (!openList.Contains(neighbor))
-                    {
-                        neighbor.Parent = current;
-                        var neighborPos = calculatePosition(neighbor.GetRoomID().x, neighbor.GetRoomID().y);
-                        neighbor.DistanceToTarget = Math.Abs(neighborPos.x - destinationPos.x) + Math.Abs(neighborPos.y - destinationPos.y);
-                        if (neighbor.Cost == 1)
-                            neighbor.Cost = neighbor.Weight + neighbor.Parent.Cost;
-                        openList.Add(neighbor);
-                        openList = openList.OrderBy(room => room.AstarValue).ToList();
-                    }
-                }
+                var room = new DungeonRoomAStar(id, false);
+                spawneDungeonRoomAStars.Add(room);
+                aStarHashMap.Add(id, room);
             }
         }
 
-        if (returnShortest)
-            return null;
+        NativeList<JobHandle> calAstarJobs = new NativeList<JobHandle>(spawnedRooms, Allocator.Persistent);
 
-        // construct path, if end was not closed return null
-        if (!closedList.Exists(x => x == spawnedFloorAStar[destination.x, destination.y]))
-            return null;
-
-        // if all good, return path
-        DungeonRoomAStar temp = closedList[closedList.IndexOf(current)];
-        if (temp == null) return null;
-
-        do
+        for (int index = 0; index < spawneDungeonRoomAStars.Count; index++)
         {
-            path.Push(temp);
-            temp = temp.Parent;
-        } while (temp != spawnedFloorAStar[start.x, start.y] && temp != null);
-        return path;
+            var id = spawneDungeonRoomAStars[index].RoomID;
 
+            if (id == (ID)startRoomPos)
+                return;
+
+            CalAStarJob aStarJob = new CalAStarJob
+            {
+                floorSize = maxFloorSize,
+                aproxDistanceX = this.approxDistanceRoomsX,
+                aproxDistanceY = this.approxDistanceRoomsY,
+                startPosition = startRoomPos,
+                endPosition = id,
+                dungeonStars = aStarHashMap,
+            };
+
+            if (calAstarJobs.Length != 0)
+            {
+                calAstarJobs.Add(aStarJob.Schedule(calAstarJobs[calAstarJobs.Length - 1]));
+                continue;
+            }
+
+            calAstarJobs.Add(aStarJob.Schedule());
+        }
+
+        JobHandle.CompleteAll(calAstarJobs);
+
+        var result = aStarHashMap.GetValueArray(Allocator.Temp);
+        spawneDungeonRoomAStars.Clear();
+        spawneDungeonRoomAStars.AddRange(result.ToList());
+
+        aStarHashMap.Dispose();
+        result.Dispose();
+        calAstarJobs.Dispose();
     }
 
-    private List<DungeonRoomAStar> getAdjacentRooms(DungeonRoomAStar room)
+    void createAstarFloorJobParallelFor()
     {
-        List<DungeonRoomAStar> temp = new List<DungeonRoomAStar>();
+        DungeonRoomAStar[] aStarFloor = new DungeonRoomAStar[maxFloorSize.x * maxFloorSize.y];
 
-        var roomPosX = room.GetRoomID().x;
-        var roomPosY = room.GetRoomID().y;
+        for (int index = 0; index < maxFloorSize.x * maxFloorSize.y; index++)
+        {
+            var id = IndexToID(index);
 
-        if (roomPosX - 1 >= 0 && spawnedFloorAStar[roomPosX - 1, roomPosY] != null)
-            temp.Add(spawnedFloorAStar[roomPosX - 1, roomPosY]);
+            if (floorMap[id.X, id.Y] != null && floorMap[id.X, id.Y] != 0)
+            {
+                aStarFloor[index] = new DungeonRoomAStar(id, false);
+                continue;
+            }
 
-        if (roomPosX + 1 <= maxFloorSize.x - 1 && spawnedFloorAStar[roomPosX + 1, roomPosY] != null)
-            temp.Add(spawnedFloorAStar[roomPosX + 1, roomPosY]);
+            aStarFloor[index] = new DungeonRoomAStar(id);
+        }
 
-        if (roomPosY - 1 >= 0 && spawnedFloorAStar[roomPosX, roomPosY - 1] != null)
-            temp.Add(spawnedFloorAStar[roomPosX, roomPosY - 1]);
+        NativeArray<DungeonRoomAStar> aStarRooms = new NativeArray<DungeonRoomAStar>(maxFloorSize.x * maxFloorSize.y, Allocator.TempJob);
+        aStarRooms.CopyFrom(aStarFloor);
 
-        if (roomPosY + 1 <= maxFloorSize.y - 1 && spawnedFloorAStar[roomPosX, roomPosY + 1] != null)
-            temp.Add(spawnedFloorAStar[roomPosX, roomPosY + 1]);
+        CalAStarJobParallel aStarCalParallel = new CalAStarJobParallel
+        {
+            floorSize = maxFloorSize,
+            aproxDistanceX = this.approxDistanceRoomsX,
+            aproxDistanceY = this.approxDistanceRoomsY,
+            startPosition = startRoomPos,
+            dungeonStars = aStarRooms,
+        };
 
-        return temp;
+        JobHandle aStarJob = aStarCalParallel.Schedule(maxFloorSize.x * maxFloorSize.y, spawnedRooms / SystemInfo.processorCount);
+        aStarJob.Complete();
+
+        spawneDungeonRoomAStars = new List<DungeonRoomAStar>(spawnedRooms);
+        spawneDungeonRoomAStars = aStarFloor.Where(x => x.Null == false).ToList();
+        aStarRooms.Dispose();
+    }*/
+
+    public ID IndexToID(int index)
+    {
+        int column = index % maxFloorSize.y;
+        int row = (index - column) / maxFloorSize.y;
+
+        return new ID(row, column);
+    }
+
+    public int IDToIndex(int x, int y)
+    {
+        return x * maxFloorSize.y + y;
+    }
+
+    private struct CalAStarJobParallel : IJobParallelFor
+    {
+        public int2 floorSize;
+        public int aproxDistanceX;
+        public int aproxDistanceY;
+
+        public ID startPosition;
+        public ID endPosition;
+
+        [NativeDisableParallelForRestriction]
+        public NativeArray<DungeonRoomAStar> dungeonStars;
+
+        public void Execute(int index)
+        {
+            if (dungeonStars[index].Null == true)
+                return;
+
+            NativeList<DungeonRoomAStar> openList = new NativeList<DungeonRoomAStar>(Allocator.Temp);
+            NativeList<DungeonRoomAStar> closedList = new NativeList<DungeonRoomAStar>(Allocator.Temp);
+
+            endPosition = IndexToID(index);
+            dungeonStars[IDtoIndex(startPosition)].setDistanceToTarget(0);
+            dungeonStars[IDtoIndex(startPosition)].setCost(0);
+
+            DungeonRoomAStar current = dungeonStars[IDtoIndex(new ID(startPosition.X, startPosition.Y))];
+            NativeList<DungeonRoomAStar> adjacentRooms = getAdjacentRooms(current.RoomID);
+            var destinationPos = calculatePosition(endPosition.X, endPosition.Y);
+
+            // add start node to Open List
+            openList.Add(dungeonStars[IDtoIndex(startPosition)]);
+
+            while (openList.Length != 0 && !closedList.Contains(dungeonStars[IDtoIndex(endPosition)]))
+            {
+                current = openList[0];
+                openList.RemoveAt(openList.IndexOf(current));
+                closedList.Add(current);
+                adjacentRooms = getAdjacentRooms(current.RoomID);
+
+                for (int i = 0; i < adjacentRooms.Length; i++)
+                {
+                    var neighbor = adjacentRooms[i];
+
+                    if (!closedList.Contains(neighbor))
+                    {
+                        if (!openList.Contains(neighbor))
+                        {
+                            neighbor.Parent = current.RoomID;
+                            var neighborPos = calculatePosition(neighbor.RoomID.X, neighbor.RoomID.Y);
+                            neighbor.DistanceToTarget = calculateDistanceToTarget(neighborPos, destinationPos);
+                            if (neighbor.Cost == 1)
+                                neighbor.Cost = neighbor.Weight + dungeonStars[IDtoIndex(neighbor.Parent)].Cost;
+                            Debug.Log(neighbor.Cost);
+
+                            openList.Add(neighbor);
+                            openList.Sort(new OrderByComparer());
+                        }
+                    }
+                }
+            }
+
+            //Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+
+            adjacentRooms.Dispose();
+            closedList.Dispose();
+            openList.Dispose();
+        }
+
+        private struct OrderByComparer : IComparer<DungeonRoomAStar>
+        {
+            public int Compare(DungeonRoomAStar x, DungeonRoomAStar y)
+            {
+                if (x.AstarValue == y.AstarValue)
+                    return 0;
+
+                if (x.AstarValue > y.AstarValue)
+                    return 1;
+
+                return -1;
+            }
+        }
+
+        private NativeList<DungeonRoomAStar> getAdjacentRooms(ID roomID)
+        {
+            NativeList<DungeonRoomAStar> temp = new NativeList<DungeonRoomAStar>(Allocator.TempJob);
+
+            var roomPosX = roomID.X;
+            var roomPosY = roomID.Y;
+
+            if (roomPosX - 1 >= 0 && dungeonStars[IDtoIndex(new ID(roomPosX - 1, roomPosY))].Null == false)
+                temp.Add(dungeonStars[IDtoIndex(new ID(roomPosX - 1, roomPosY))]);
+
+            if (roomPosX + 1 <= floorSize.x - 1 && dungeonStars[IDtoIndex(new ID(roomPosX + 1, roomPosY))].Null == false)
+                temp.Add(dungeonStars[IDtoIndex(new ID(roomPosX + 1, roomPosY))]);
+
+            if (roomPosY - 1 >= 0 && dungeonStars[IDtoIndex(new ID(roomPosX, roomPosY - 1))].Null == false)
+                temp.Add(dungeonStars[IDtoIndex(new ID(roomPosX, roomPosY - 1))]);
+
+            if (roomPosY + 1 <= floorSize.y - 1 && dungeonStars[IDtoIndex(new ID(roomPosX, roomPosY + 1))].Null == false)
+                temp.Add(dungeonStars[IDtoIndex(new ID(roomPosX, roomPosY + 1))]);
+
+            return temp;
+        }
+
+        Vector2 calculatePosition(int x, int y)
+        {
+            var xDif = x - startPosition.X;
+            var yDif = y - startPosition.Y;
+
+            var xPos = aproxDistanceX * xDif;
+            var yPos = aproxDistanceY * yDif;
+
+            return new Vector2(xPos, yPos);
+        }
+
+        private float calculateDistanceToTarget(Vector2 start, Vector2 target) => math.abs(start.x - target.x) + math.abs(start.y - target.y);
+
+        private ID IndexToID(int index)
+        {
+            int column = index % floorSize.y;
+            int row = (index - column) / floorSize.y;
+
+            return new ID(row, column);
+        }
+
+        private int IDtoIndex(int x, int y)
+        {
+            return x * floorSize.y + y;
+        }
+
+        private int IDtoIndex(ID id)
+        {
+            return id.X * floorSize.y + id.Y;
+        }
+    }
+
+    private struct CalAStarJob : IJob
+    {
+        public int2 floorSize;
+        public int aproxDistanceX;
+        public int aproxDistanceY;
+
+        public ID startPosition;
+        public ID endPosition;
+
+        public NativeHashMap<ID, DungeonRoomAStar> dungeonStars;
+
+        public void Execute()
+        {
+            NativeList<DungeonRoomAStar> openList = new NativeList<DungeonRoomAStar>(Allocator.Temp);
+            NativeList<DungeonRoomAStar> closedList = new NativeList<DungeonRoomAStar>(Allocator.Temp);
+            DungeonRoomAStar current = dungeonStars[new ID(startPosition.X, startPosition.Y)];
+            NativeList<DungeonRoomAStar> adjacentRooms = getAdjacentRooms(current.RoomID);
+            var destinationPos = calculatePosition(endPosition.X, endPosition.Y);
+
+            // add start node to Open List
+            openList.Add(dungeonStars[new ID(startPosition.X, startPosition.Y)]);
+
+            while (openList.Length != 0 && !closedList.Contains(dungeonStars[endPosition]))
+            {
+                current = openList[0];
+                openList.RemoveAt(openList.IndexOf(current));
+                closedList.Add(current);
+                adjacentRooms = getAdjacentRooms(current.RoomID);
+
+                for (int i = 0; i < adjacentRooms.Length; i++)
+                {
+                    var neighbor = adjacentRooms[i];
+
+                    if (!closedList.Contains(neighbor))
+                    {
+                        if (!openList.Contains(neighbor))
+                        {
+                            neighbor.Parent = current.RoomID;
+                            var neighborPos = calculatePosition(neighbor.RoomID.X, neighbor.RoomID.Y);
+                            neighbor.DistanceToTarget = math.abs(neighborPos.x - destinationPos.x) + math.abs(neighborPos.y - destinationPos.y);
+                            if (neighbor.Cost == 1)
+                                neighbor.Cost = neighbor.Weight + dungeonStars[neighbor.Parent].Cost;
+
+                            Debug.Log(neighbor.Cost);
+
+                            openList.Add(neighbor);
+                            openList.Sort(new OrderByComparer());
+                        }
+                    }
+                }
+            }
+
+            //Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+
+            adjacentRooms.Dispose();
+            closedList.Dispose();
+            openList.Dispose();
+        }
+
+        private struct OrderByComparer : IComparer<DungeonRoomAStar>
+        {
+            public int Compare(DungeonRoomAStar x, DungeonRoomAStar y)
+            {
+                if (x.AstarValue > y.AstarValue)
+                    return 1;
+
+                return -1;
+            }
+        }
+
+        private NativeList<DungeonRoomAStar> getAdjacentRooms(ID roomID)
+        {
+            NativeList<DungeonRoomAStar> temp = new NativeList<DungeonRoomAStar>(Allocator.Temp);
+
+            var roomPosX = roomID.X;
+            var roomPosY = roomID.Y;
+
+            if (roomPosX - 1 >= 0 && dungeonStars.ContainsKey(new ID(roomPosX - 1, roomPosY)))
+                temp.Add(dungeonStars[new ID(roomPosX - 1, roomPosY)]);
+
+            if (roomPosX + 1 <= floorSize.x - 1 && dungeonStars.ContainsKey(new ID(roomPosX + 1, roomPosY)))
+                temp.Add(dungeonStars[new ID(roomPosX + 1, roomPosY)]);
+
+            if (roomPosY - 1 >= 0 && dungeonStars.ContainsKey(new ID(roomPosX, roomPosY - 1)))
+                temp.Add(dungeonStars[new ID(roomPosX, roomPosY - 1)]);
+
+            if (roomPosY + 1 <= floorSize.y - 1 && dungeonStars.ContainsKey(new ID(roomPosX, roomPosY + 1)))
+                temp.Add(dungeonStars[new ID(roomPosX, roomPosY + 1)]);
+
+            return temp;
+        }
+
+        Vector2 calculatePosition(int x, int y)
+        {
+            var xDif = x - startPosition.X;
+            var yDif = y - startPosition.Y;
+
+            var xPos = aproxDistanceX * xDif;
+            var yPos = aproxDistanceY * yDif;
+
+            return new Vector2(xPos, yPos);
+        }
+
+        private ID IndexToID(int index)
+        {
+            int column = index % floorSize.y;
+            int row = (index - column) / floorSize.y;
+
+            return new ID(row, column);
+        }
+
+        private int IDtoIndex(int x, int y)
+        {
+            return x * floorSize.y + y;
+        }
+
+        private int IDtoIndex(ID id)
+        {
+            return id.X * floorSize.y + id.Y;
+        }
     }
 
     Vector2 calculatePosition(int x, int y)
     {
-        var xDif = x - startRoomPos.x;
-        var yDif = y - startRoomPos.y;
+        var xDif = x - dungeonFloor.startRoomPos.x;
+        var yDif = y - dungeonFloor.startRoomPos.y;
 
-        var xPos = aproxDistanceRoomsX * xDif;
-        var yPos = aproxDistanceRoomsY * yDif;
+        var xPos = approxDistanceRoomsX * xDif;
+        var yPos = approxDistanceRoomsY * yDif;
 
         return new Vector2(xPos, yPos);
     }
@@ -281,12 +552,16 @@ public class DungeonManager : MonoBehaviour
     void createFloor()
     {
         //later done by prefab manager
+        spawnedFloor = new DungeonRoom[maxFloorSize.x, maxFloorSize.y];
 
         for (int x = 0; x < maxFloorSize.x; x++)
             for (int y = 0; y < maxFloorSize.y; y++)
-                if (floorMap[x, y] != null && floorMap[x, y] != 0)
-                    createDungeonRoom(x, y, floorMap[x, y].Value);
+            {
+                var room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(x, y)];
 
+                if (room.created && !room.Null)
+                    createDungeonRoom(x, y, 1);
+            }
     }
 
     void createDungeonRoom(int x, int y, int roomType)
@@ -305,20 +580,24 @@ public class DungeonManager : MonoBehaviour
         spawnedFloor[x, y].SetLod(LodActive);
 
         if (roomType != 9)
-            spawnedFloor[x, y].gameObject.SetActive(false);
+            spawnedFloor[x, y].gameObject.SetActive(!debugSetActive);
     }
 
     int checkNeighborCount(int x, int y)
     {
         int neighborCount = 0;
 
-        if (x - 1 >= 0 && floorMap[x - 1, y] != null)
+        var room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(x - 1, y)];
+        if (x - 1 >= 0 && room.created && !room.Null)
             neighborCount++;
-        if (x + 1 <= maxFloorSize.x - 1 && floorMap[x + 1, y] != null)
+        room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(x + 1, y)];
+        if (x + 1 <= maxFloorSize.x - 1 && room.created && !room.Null)
             neighborCount++;
-        if (y - 1 >= 0 && floorMap[x, y - 1] != null)
+        room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(x, y - 1)];
+        if (y - 1 >= 0 && room.created && !room.Null)
             neighborCount++;
-        if (y + 1 <= maxFloorSize.y - 1 && floorMap[x, y + 1] != null)
+        room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(x, y + 1)];
+        if (y + 1 <= maxFloorSize.y - 1 && room.created && !room.Null)
             neighborCount++;
 
         return neighborCount;
@@ -332,9 +611,9 @@ public class DungeonManager : MonoBehaviour
 
         List<ID> endRooms = new List<ID>();
 
-        for (int x = 0; x < floorMap.GetLength(0); x++)
+        for (int x = 0; x < maxFloorSize.x; x++)
         {
-            for (int y = 0; y < floorMap.GetLength(1); y++)
+            for (int y = 0; y < maxFloorSize.y; y++)
             {
                 if (checkNeighborCount(x, y) == 1)
                     endRooms.Add(new ID(x, y));
@@ -359,10 +638,10 @@ public class DungeonManager : MonoBehaviour
 
     public DungeonRoom GetRoomByID(ID roomID)
     {
-        return GetRoomByID(roomID.x, roomID.y);
+        return GetRoomByID(roomID.X, roomID.Y);
     }
 
-    public Vector2Int GetFloorSize() => maxFloorSize;
+    public int2 GetFloorSize() => maxFloorSize;
 
     void printMapAsText()
     {
@@ -373,10 +652,11 @@ public class DungeonManager : MonoBehaviour
             debugOutput.text += "\n";
             for (int j = 0; j < maxFloorSize.y; j++)
             {
-                if (floorMap[i, j] == null && floorMap[i, j] != 0)
-                    debugOutput.text += " - ";
+                var room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(i, j)];
+                if (!room.Null && room.created)
+                    debugOutput.text += " " + "1";
                 else
-                    debugOutput.text += " " + floorMap[i, j];
+                    debugOutput.text += " - ";
             }
         }
 
@@ -385,17 +665,18 @@ public class DungeonManager : MonoBehaviour
 
         debugOutput.text += "\n Astar map";
 
-        for (int i = 0; i < maxFloorSize.x; i++)
-        {
-            debugOutput.text += "\n";
-            for (int j = 0; j < maxFloorSize.y; j++)
-            {
-                if (spawnedFloorAStar[i, j] == null || floorMap[i, j] == 0)
-                    debugOutput.text += " -  ";
-                else
-                    debugOutput.text += spawnedFloorAStar[i, j].Cost + "  ";
-            }
-        }
+        //for (int i = 0; i < maxFloorSize.x; i++)
+        //{
+        //    debugOutput.text += "\n";
+        //    for (int j = 0; j < maxFloorSize.y; j++)
+        //    {
+        //        if (spawnedFloorAStar[i, j] == null || floorMap[i, j] == 0)
+        //            debugOutput.text += " -  ";
+        //        else
+        //            debugOutput.text += spawnedFloorAStar[i, j].Cost + "  ";
+        //    }
+        //}
+
     }
 
 }

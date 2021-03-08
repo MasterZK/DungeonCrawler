@@ -1,4 +1,4 @@
-using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class DungeonRoom : MonoBehaviour
@@ -37,16 +37,16 @@ public class DungeonRoom : MonoBehaviour
 
     private void setNeighborRooms(ID room, bool state)
     {
-        setRoom(room + Vector2Int.down, state);
         setRoom(room + Vector2Int.up, state);
-        setRoom(room + Vector2Int.right, state);
+        setRoom(room + Vector2Int.down, state);
         setRoom(room + Vector2Int.left, state);
+        setRoom(room + Vector2Int.right, state);
     }
 
     private void setRoom(ID room, bool state)
     {
         DungeonRoom? tempRoom = null;
-        if (!(room == this.roomID))
+        if (room != this.roomID)
             tempRoom = dungeonManager.GetRoomByID(room);
 
         if (tempRoom != null)
@@ -60,28 +60,28 @@ public class DungeonRoom : MonoBehaviour
 
     public void setTeleporters()
     {
-        var result = dungeonManager.GetRoomByID(roomID.x - 1, roomID.y);
+        var result = dungeonManager.GetRoomByID(roomID.X - 1, roomID.Y);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(1);
             doors[3].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.GetRoomByID(roomID.x + 1, roomID.y);
+        result = dungeonManager.GetRoomByID(roomID.X + 1, roomID.Y);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(3);
             doors[1].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.GetRoomByID(roomID.x, roomID.y - 1);
+        result = dungeonManager.GetRoomByID(roomID.X, roomID.Y - 1);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(0);
             doors[2].SetTeleportDestination(teleDestination.spawnPoint.position);
         }
 
-        result = dungeonManager.GetRoomByID(roomID.x, roomID.y + 1);
+        result = dungeonManager.GetRoomByID(roomID.X, roomID.Y + 1);
         if (result != null)
         {
             var teleDestination = result.getTeleporter(2);
@@ -97,8 +97,8 @@ public class DungeonRoom : MonoBehaviour
 
     public void SetRoomID(int xID, int yID)
     {
-        roomID = new ID(xID, yID);
-        this.gameObject.name = (roomID.x + 1) + " " + (roomID.y + 1);
+        roomID = new int2(xID, yID);
+        this.gameObject.name = (roomID.X + 1) + " " + (roomID.Y + 1);
     }
 
     public ID GetRoomID() => roomID;
