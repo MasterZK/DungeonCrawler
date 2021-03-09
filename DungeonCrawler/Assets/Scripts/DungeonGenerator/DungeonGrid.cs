@@ -5,7 +5,7 @@ using UnityEngine;
 
 public struct DungeonGrid : IDisposable
 {
-    private int2 maxFloorSize;
+    public int2 maxFloorSize { get; }
     private int approxDistanceRoomsX;
     private int approxDistanceRoomsY;
 
@@ -79,7 +79,8 @@ public struct DungeonGrid : IDisposable
     {
         DungeonGrid newGrid = this;
         newGrid.floorMap = new NativeArray<DungeonRoomAStar>(floorMap.Length, allocator);
-        floorMap.CopyTo(newGrid.floorMap);
+        //this.floorMap.CopyTo(newGrid.floorMap);
+        newGrid.floorMap.CopyFrom(floorMap);
 
         return newGrid;
     }

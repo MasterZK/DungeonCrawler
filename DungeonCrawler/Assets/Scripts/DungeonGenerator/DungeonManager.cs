@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using Unity.Burst;
 using Unity.Collections;
@@ -50,6 +48,7 @@ public class DungeonManager : MonoBehaviour
     [SerializeField] private Text debugOutput;
 
     private DungeonGrid dungeonFloor;
+    private AStarPathFinder aStarCalculator;
 
     private int spawnedRooms = 0;
     private Stack<Vector2Int> spawnBuffer = new Stack<Vector2Int>();
@@ -77,17 +76,17 @@ public class DungeonManager : MonoBehaviour
             spawnFloorMath();
         } while (spawnedRooms <= minRoomsSpawned);
 
-        //if (createAstar)
-        //    createAstarFloorJob();
+        if (createAstar)
+            createAStarFloor();
 
         if (createRooms)
-        {
             createFloor();
 
+        if (createRooms)
             foreach (var room in spawnedFloor)
                 if (room != null)
                     room.setTeleporters();
-        }
+
 
         Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
 
@@ -157,9 +156,6 @@ public class DungeonManager : MonoBehaviour
     public DungeonRoomAStar CreateRoom(ID roomID, float chance)
     {
         var result = ChooseRandom(0, 1, chance);
-        Debug.Log(result);
-
-
         return new DungeonRoomAStar(roomID, result != 1);
     }
 
@@ -173,6 +169,34 @@ public class DungeonManager : MonoBehaviour
 
         return valueTwo;
     }
+
+    public void createAStarFloor()
+    {
+        if (!this.GetComponent<AStarPathFinder>())
+            this.gameObject.AddComponent<AStarPathFinder>();
+
+        aStarCalculator = gameObject.GetComponent<AStarPathFinder>();
+        aStarCalculator.SetGrid(dungeonFloor);
+
+        var roomSpawned = false;
+
+        for (int i = 0; i < maxFloorSize.x * maxFloorSize.y; i++)
+        {
+            if (roomSpawned)
+                break;
+
+            if (!(!dungeonFloor.floorMap[i].Null && dungeonFloor.floorMap[i].created))
+                continue;
+
+            Debug.Log("ping");
+            var astar = new AStarSearchCall(dungeonFloor.startRoomPos, dungeonFloor.IndexToID(i));
+            aStarCalculator.QueueJob(astar);
+            aStarCalculator.DequeueJob();
+            dungeonFloor.floorMap[i] = astar.result;
+            roomSpawned = true;
+        }
+    }
+
 
     /*
     void createAstarFloorJob()
@@ -267,19 +291,6 @@ public class DungeonManager : MonoBehaviour
         spawneDungeonRoomAStars = aStarFloor.Where(x => x.Null == false).ToList();
         aStarRooms.Dispose();
     }*/
-
-    public ID IndexToID(int index)
-    {
-        int column = index % maxFloorSize.y;
-        int row = (index - column) / maxFloorSize.y;
-
-        return new ID(row, column);
-    }
-
-    public int IDToIndex(int x, int y)
-    {
-        return x * maxFloorSize.y + y;
-    }
 
     private struct CalAStarJobParallel : IJobParallelFor
     {
@@ -568,7 +579,7 @@ public class DungeonManager : MonoBehaviour
     {
         GameObject room;
 
-        if (roomType == 9)
+        if (new ID(x,y) == dungeonFloor.startRoomPos)
             room = Instantiate(startSpawnRoom, calculatePosition(x, y),
                 startSpawnRoom.transform.rotation, this.transform);
         else
@@ -579,7 +590,7 @@ public class DungeonManager : MonoBehaviour
         spawnedFloor[x, y].SetRoomID(x, y);
         spawnedFloor[x, y].SetLod(LodActive);
 
-        if (roomType != 9)
+        if (new ID(x, y) != dungeonFloor.startRoomPos)
             spawnedFloor[x, y].gameObject.SetActive(!debugSetActive);
     }
 
@@ -664,6 +675,19 @@ public class DungeonManager : MonoBehaviour
             return;
 
         debugOutput.text += "\n Astar map";
+
+        for (int i = 0; i < maxFloorSize.x; i++)
+        {
+            debugOutput.text += "\n";
+            for (int j = 0; j < maxFloorSize.y; j++)
+            {
+                var room = dungeonFloor.floorMap[dungeonFloor.IDToIndex(i, j)];
+                if (!room.Null && room.created)
+                    debugOutput.text += " " + room.Cost;
+                else
+                    debugOutput.text += " - ";
+            }
+        }
 
         //for (int i = 0; i < maxFloorSize.x; i++)
         //{
