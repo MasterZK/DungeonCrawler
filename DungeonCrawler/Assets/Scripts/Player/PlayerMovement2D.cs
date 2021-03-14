@@ -114,7 +114,7 @@ public class PlayerMovement2D : MonoBehaviour
         {
             if ((Time.time - lastTapTimeA) < tapSpeed)
                 dashing = true;
-            
+
             lastTapTimeA = Time.time;
         }
 
@@ -128,7 +128,14 @@ public class PlayerMovement2D : MonoBehaviour
 
         if (dashing)
         {
-            StartCoroutine(DashPlayer(new Vector3(Input.GetAxisRaw("Horizontal"),0,0) * dashDistance));
+            var input = Input.GetAxisRaw("Horizontal");
+            if (input == 0)
+            {
+                dashing = false;
+                return;
+            }
+
+            StartCoroutine(DashPlayer(new Vector3(input, 0, 0) * checkDashCollision(input)));
 
             Camera.main.DOComplete();
             Camera.main.DOShakePosition(0.2f, 0.1f);
@@ -142,13 +149,25 @@ public class PlayerMovement2D : MonoBehaviour
         playerRb2D.velocity = Vector2.zero;
         playerRb2D.gravityScale = 0;
 
-        var tween = playerRb2D.DOMove(this.transform.position + direction, dashSpeed);
+        var tween = playerRb2D.DOMove(this.transform.position + direction, dashSpeed * math.abs(direction.x / dashDistance));
         yield return tween.WaitForCompletion();
 
         if (iFrames)
             playerCollider.isTrigger = false;
         dashing = false;
         playerRb2D.gravityScale = 1;
+    }
+
+    float checkDashCollision(float direction)
+    {
+        int layer = 1 << 9;
+        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, new Vector2(direction, 0), math.INFINITY, layer);
+        var distance = (hit.point - playerRb2D.position).magnitude;
+
+        if (distance < dashDistance)
+            return distance - 0.5f;
+
+        return dashDistance;
     }
 
     bool crouch()
