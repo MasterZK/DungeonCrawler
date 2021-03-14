@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class AStarPathFinder : MonoBehaviour
@@ -89,6 +88,12 @@ public class AStarPathFinder : MonoBehaviour
 
     public void QueueJob(AStarSearchCall request) => requests.Enqueue(request);
 
+    public void MassQueueJob(List<AStarSearchCall> massRequests)
+    {
+        for (int i = 0; i < massRequests.Count; i++)
+            requests.Enqueue(massRequests[i]);
+    }
+
     public void DequeueJob()
     {
         if (requests.Count == 0)
@@ -101,7 +106,7 @@ public class AStarPathFinder : MonoBehaviour
             startNode = currentRequest.startNode,
             endNode = currentRequest.endNode,
             grid = grid.Copy(Allocator.TempJob),
-            result = new NativeList<DungeonRoomAStar>(1,Allocator.TempJob),
+            result = new NativeList<DungeonRoomAStar>(1, Allocator.TempJob),
             openNodes = new NativeBinaryHeap<DungeonRoomAStar>((int)(grid.maxFloorSize.x * grid.maxFloorSize.y / 4), Allocator.TempJob),
             closedNodes = new NativeHashMap<ID, DungeonRoomAStar>(128, Allocator.TempJob)
         };
@@ -116,6 +121,53 @@ public class AStarPathFinder : MonoBehaviour
         job.openNodes.Dispose();
         job.closedNodes.Dispose();
         currentRequest = null;
+    }
+
+    public void MassDequeueJob(int dequeueAmount)
+    {
+        if (requests.Count == 0)
+            return;
+
+        List<AStarSearchCall> requestCalls = new List<AStarSearchCall>();
+        ProcessPathJob[] jobs = new ProcessPathJob[dequeueAmount];
+        NativeArray<JobHandle> jobHandles = new NativeArray<JobHandle>(dequeueAmount, Allocator.TempJob);
+
+        for (int i = 0; i < dequeueAmount; i++)
+        {
+            if (requests.Count == 0)
+                break;
+
+            requestCalls.Add(requests.Dequeue());
+            currentRequest = requestCalls[requestCalls.Count - 1];
+
+            job = new ProcessPathJob()
+            {
+                startNode = currentRequest.startNode,
+                endNode = currentRequest.endNode,
+                grid = grid.Copy(Allocator.TempJob),
+                result = new NativeList<DungeonRoomAStar>(1, Allocator.TempJob),
+                openNodes = new NativeBinaryHeap<DungeonRoomAStar>((int)(grid.maxFloorSize.x * grid.maxFloorSize.y / 4), Allocator.TempJob),
+                closedNodes = new NativeHashMap<ID, DungeonRoomAStar>(128, Allocator.TempJob)
+            };
+
+            jobs[i] = job;
+            jobHandles[i] = job.Schedule();
+        }
+
+        JobHandle.CompleteAll(jobHandles);
+
+        for (int j = 0; j < requestCalls.Count; j++)
+        {
+            requestCalls[j].result = jobs[j].result[0];
+            requestCalls[j].IsDone = true;
+
+            jobs[j].grid.Dispose();
+            jobs[j].result.Dispose();
+            jobs[j].openNodes.Dispose();
+            jobs[j].closedNodes.Dispose();
+        }
+
+        jobHandles.Dispose();
     }
 
     public void SetGrid(DungeonGrid newGrid)
