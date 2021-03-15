@@ -417,6 +417,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0-preview\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="InspectorGadgets.Lite">
+      <HintPath>Assets\Plugins\Inspector Gadgets\Misc\Inspector Gadgets Lite\InspectorGadgets.Lite.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.2.1f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\mscorlib.dll</HintPath>
     </Reference>

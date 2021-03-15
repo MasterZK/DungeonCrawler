@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.RenderPipelines.Unive
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary", "Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj", "{812E338B-F15D-D346-8B29-5B4D83E7FA5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InspectorGadgets", "InspectorGadgets.csproj", "{EF287B1A-2681-2D91-F3CF-5D523BD42AB6}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.ShaderGraph.Editor", "Unity.ShaderGraph.Editor.csproj", "{0FAAA10E-3449-4C78-E5A9-7E564E1CF553}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.VisualStudio.Editor", "Unity.VisualStudio.Editor.csproj", "{77AC2651-5CF1-0975-49E7-A7DA9541D958}"
@@ -112,6 +114,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.ShaderGraph.Utilities", "Unity.ShaderGraph.Utilities.csproj", "{D1EA9E32-5597-4E52-FA9B-D21E08322E32}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Collections.BurstCompatibilityGen", "Unity.Collections.BurstCompatibilityGen.csproj", "{B6C2BCBB-538B-5C1E-8BED-64A65D3F4A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{D27E8EB1-19C7-4C83-4C0C-90D39A7BC5B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,6 +227,10 @@ Global
 		{812E338B-F15D-D346-8B29-5B4D83E7FA5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{812E338B-F15D-D346-8B29-5B4D83E7FA5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{812E338B-F15D-D346-8B29-5B4D83E7FA5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF287B1A-2681-2D91-F3CF-5D523BD42AB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF287B1A-2681-2D91-F3CF-5D523BD42AB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF287B1A-2681-2D91-F3CF-5D523BD42AB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF287B1A-2681-2D91-F3CF-5D523BD42AB6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FAAA10E-3449-4C78-E5A9-7E564E1CF553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FAAA10E-3449-4C78-E5A9-7E564E1CF553}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FAAA10E-3449-4C78-E5A9-7E564E1CF553}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -343,6 +351,10 @@ Global
 		{B6C2BCBB-538B-5C1E-8BED-64A65D3F4A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6C2BCBB-538B-5C1E-8BED-64A65D3F4A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6C2BCBB-538B-5C1E-8BED-64A65D3F4A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D27E8EB1-19C7-4C83-4C0C-90D39A7BC5B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D27E8EB1-19C7-4C83-4C0C-90D39A7BC5B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D27E8EB1-19C7-4C83-4C0C-90D39A7BC5B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D27E8EB1-19C7-4C83-4C0C-90D39A7BC5B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
