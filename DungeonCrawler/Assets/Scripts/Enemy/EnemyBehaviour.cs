@@ -9,6 +9,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
     [Header("Enemy Attributes")]
     [SerializeField] protected float movementSpeed = 45;
     [SerializeField] protected float jumpVelocity = 100;
+    [SerializeField] private float deaccelerationMultiplier = 0.05f;
     [SerializeField] protected float targetAccuracy = 1;
 
     [Header("Debug")]
@@ -17,7 +18,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
     [Header("Animation")]
     [SerializeField] protected float spawnSpeed = 0.5f;
 
-    protected int2 currentRoom;
+    protected ID currentRoom;
     protected PlayerAttributes player;
     protected Rigidbody2D enemyRb;
     protected Collider2D enemyCollider;
@@ -36,6 +37,8 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
         enemyAnimator = this.GetComponent<Animator>();
         enemyAnimator.SetFloat("animationSpeed", spawnSpeed);
+
+        this.gameObject.tag = "Hostile";
 
         spawnAnimation();
     }
@@ -56,11 +59,13 @@ public abstract class EnemyBehaviour : MonoBehaviour
     {
         if (enemyRb.gravityScale != 1.0f)
             return;
-
-        var compare = player.CurrentRoom != this.currentRoom;
-        if (compare.x && compare.y)
+        if (player.CurrentRoom != this.currentRoom)
             return;
+
+        Behaviour();
     }
+
+    protected abstract void Behaviour();
 
     protected async void spawnAnimation()
     {
@@ -75,11 +80,43 @@ public abstract class EnemyBehaviour : MonoBehaviour
         await Task.Delay(TimeSpan.FromSeconds(seconds));
     }
 
-    protected abstract void move();
+    //TODO rewrite for diffrent enemy types
+    protected void move()
+    {
+        if (horizontalCheckAbs() > 0.9f || horizontalCheckAbs() < -0.9f)
+            enemyRb.AddForce(new Vector2((horizontalCheckAbs() * movementSpeed * 10 * Time.deltaTime) * targetAccuracy, 0.0f), ForceMode2D.Impulse);
 
-    protected abstract void jump();
+        if (enemyRb.velocity.y < 0)
+            enemyRb.velocity += Vector2.up * Physics2D.gravity * 3 * Time.deltaTime;
+    }
 
-    protected abstract void ground();
+    protected void jump()
+    {
+        if (grounded)
+            if (verticalCheck() > 5.0f)
+                enemyRb.AddForce((Vector2.up * jumpVelocity * 5 * Time.deltaTime) * targetAccuracy, ForceMode2D.Impulse);
+            else
+                enemyRb.AddForce((Vector2.up * jumpVelocity * Time.deltaTime) * targetAccuracy, ForceMode2D.Impulse);
+    }
+
+    protected void ground()
+    {
+        int layer = 1 << 9;
+        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, Vector2.down, math.INFINITY, layer);
+        var distance = (hit.point - enemyRb.position).magnitude;
+        grounded = distance > 0 && distance <= (enemyCollider.bounds.size.y * 0.55f);
+    }
+
+    protected void velocityCancel()
+    {
+        if (enemyRb.velocity.x < -0.1f)
+            enemyRb.velocity += Vector2.right * movementSpeed * deaccelerationMultiplier * Time.deltaTime;
+        else if (enemyRb.velocity.x > 0.1f)
+            enemyRb.velocity -= Vector2.right * movementSpeed * deaccelerationMultiplier * Time.deltaTime;
+        else if (-0.1f < enemyRb.velocity.x && enemyRb.velocity.x < 0.1f)
+            enemyRb.velocity = new Vector2(0, enemyRb.velocity.y);
+
+    }
 
     protected float horizontalCheck()
     {
@@ -92,7 +129,6 @@ public abstract class EnemyBehaviour : MonoBehaviour
     }
 
     protected float horizontalCheckAbs() => horizontalCheck() / math.abs(horizontalCheck());
-
 
     protected float verticalCheck()
     {
