@@ -12,7 +12,12 @@ public class ScreenFade : MonoBehaviour
 
     public void DoScreenFade(double time)
     {
-        screenAnimator.playableGraph.GetRootPlayable(0).SetDuration(time);
+        screenAnimator.time = 0;
+        screenAnimator.RebuildGraph();
+
+        var screenFadeMultiplier = time * screenAnimator.duration;
+
+        screenAnimator.playableGraph.GetRootPlayable(0).SetSpeed(screenFadeMultiplier);
         screenAnimator.Play();
     }
 }

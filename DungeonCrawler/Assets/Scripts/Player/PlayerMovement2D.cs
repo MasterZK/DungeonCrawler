@@ -67,18 +67,17 @@ public class PlayerMovement2D : MonoBehaviour
         if (transitioning)
             return;
 
+        crouch();
         groundPlayer();
         checkPlayerInputH();
         playerVelocityCancel();
         jump();
-        crouch();
     }
 
     private void LateUpdate()
     {
         if (currentJumps < maxJumps && grounded)
             currentJumps = maxJumps;
-
     }
 
     Vector2 checkPlayerInputH()
@@ -172,10 +171,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     bool crouch()
     {
-        var crouchInput = Input.GetAxisRaw("VerticalNeg");
-        crouching = crouchInput != 0;
-
-        //this.transform.localScale = crouching ? originalScale / 2 : originalScale;
+        crouching = Input.GetAxisRaw("VerticalNeg") != 0;
         this.transform.DOScale(crouching ? originalScale / 2 : originalScale, 0.3f);
 
         return crouching;

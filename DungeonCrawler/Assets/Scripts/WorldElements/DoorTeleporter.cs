@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class DoorTeleporter : MonoBehaviour
 {
-    [SerializeField] private Vector3 destinationPosition;
     [SerializeField] public Transform spawnPoint;
+    [SerializeField] private Vector3 destinationPosition;
     [SerializeField] private ScreenFade screenFader;
     [SerializeField] private double transitionTime = 0.40f;
     [SerializeField] private GameObject connectedPlatform;
@@ -55,15 +55,17 @@ public class DoorTeleporter : MonoBehaviour
 
     IEnumerator MovePlayer(Collider2D player)
     {
+        var playerRb = player.GetComponent<Rigidbody2D>();
+
+        playerRb.velocity = Vector2.zero;
         player.isTrigger = true;
         player.GetComponent<PlayerMovement2D>().transitioning = true;
-        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
-        var tween = player.GetComponent<Rigidbody2D>().DOMove(destinationPosition, (float) transitionTime);
+        var tween = playerRb.DOMove(destinationPosition, (float) transitionTime);
         yield return tween.WaitForCompletion();
 
         player.GetComponent<PlayerMovement2D>().transitioning = false;
         player.isTrigger = false;
-        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        playerRb.velocity = Vector2.zero;
     }
 }

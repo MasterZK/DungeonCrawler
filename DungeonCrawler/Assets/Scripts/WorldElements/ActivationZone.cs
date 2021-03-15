@@ -18,6 +18,6 @@ public class ActivationZone : MonoBehaviour
     {
         if (deactivateOnExit && collision.CompareTag(activatorTag))
             for (int i = 0; i < objects.Length; i++)
-                objects[i].SetActive(true);
+                objects[i].SetActive(false);
     }
 }
