@@ -7,11 +7,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_DisolveShaderSprite
-  m_Shader: {fileID: -6465566751694194690, guid: ff457d7600a2c75488a1353a91081ed3, type: 3}
+  m_Name: GlowWhite
+  m_Shader: {fileID: -6465566751694194690, guid: 3b0c203eb81374341a5fbf795be9fdca, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -19,10 +19,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - Texture2D_7d68f67193aa449a91fe1a7fed71a8a5:
-        m_Texture: {fileID: 2800000, guid: 6a1dd0dd743e23f4c8825bf47409c13d, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -40,12 +36,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_805a4cc0981848ae8327d81ad017ac99: 0.5
-    - Vector1_86a042883dde4708a627fc9748d20d77: 10
-    - Vector1_9df785a504cd495096733284bb1b141d: 0
-    - _DisolveAmount: -0.5
+    - Vector1_067fac6e47014abc9564045ceffc6fc6: 1.5
+    - Vector1_11465ff1fd0a4e598e3579ae486269a5: 1
     m_Colors:
-    - Color_0914fb914fce4021bd3235a853b6789e: {r: 1, g: 0, b: 0, a: 0}
-    - Color_6484fa767586462da1923a1b1ec5dbc9: {r: 1024, g: 0, b: 0, a: 0}
-    - _MainColor: {r: 2.9960785, g: 2.9960785, b: 2.9960785, a: 0}
+    - Color_2d92b52d12a84ddfa79a0300c34b17f3: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 0}
   m_BuildTextureStacks: []

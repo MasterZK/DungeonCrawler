@@ -103,17 +103,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 24042002
   useSeed: 1
-  minRoomsSpawned: 10
-  maxRoomsSpawned: 30
+  minRoomsSpawned: 43
+  maxRoomsSpawned: 62
   floorDensity: 0.4
-  maxFloorSize: {x: 10, y: 20}
+  maxFloorSize:
+    x: 10
+    y: 20
   aproxDistanceRoomsX: 25
   aproxDistanceRoomsY: 15
   prefabManager: {fileID: 0}
   spawnableRooms: []
-  startSpawnRoom: {fileID: 3673116505445291322, guid: 4dcb998f2ea5561469b1a6d959fac5a5, type: 3}
+  startSpawnRoom: {fileID: 2284654194959472384, guid: d4f3433fffe49344f8b99e81194bda1c, type: 3}
+  LodActive: 1
+  createRooms: 0
+  createAstar: 1
   debugTextoutput: 0
   debugOutput: {fileID: 0}
-  createRooms: 1
   raycastPlane: {fileID: 8498209692275791478}
-  LodActive: 0
