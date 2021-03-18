@@ -41,6 +41,7 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Texture2D customMouseTexture = null;
     [SerializeField] private CursorLockMode cursorMode;
 
+    private PlayerMovement2D player;
 
     // Start is called before the first frame update
     void Start()
@@ -49,6 +50,8 @@ public class WeaponController : MonoBehaviour
             Cursor.SetCursor(customMouseTexture, new Vector2(customMouseTexture.height / 2, customMouseTexture.width / 2), CursorMode.ForceSoftware);
         Cursor.lockState = cursorMode;
 
+        player = FindObjectOfType<PlayerMovement2D>();
+
         initWeaponStats();
         setWeapon(currentWeapon,true);
     }
@@ -56,9 +59,19 @@ public class WeaponController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!player.canMove)
+            return;
+
         adjustWeaponDirection();
         shootProjectile();
     }
+
+    public void ResetRotation()
+    {
+        this.transform.rotation = Quaternion.identity;
+    }
+
+    public void SetMouseState(bool state) => Cursor.visible = state;
 
     void initWeaponStats()
     {
@@ -138,10 +151,8 @@ public class WeaponController : MonoBehaviour
 
     Vector3 getMousePosition()
     {
-        RaycastHit2D hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        hit = Physics2D.Raycast(ray.origin, ray.direction);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
         return hit.point;
     }

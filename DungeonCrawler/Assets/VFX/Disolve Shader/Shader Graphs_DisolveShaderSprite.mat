@@ -43,7 +43,7 @@ Material:
     - Vector1_805a4cc0981848ae8327d81ad017ac99: 0.5
     - Vector1_86a042883dde4708a627fc9748d20d77: 10
     - Vector1_9df785a504cd495096733284bb1b141d: 0
-    - _DisolveAmount: -0.5
+    - _DisolveAmount: -0.2
     m_Colors:
     - Color_0914fb914fce4021bd3235a853b6789e: {r: 1, g: 0, b: 0, a: 0}
     - Color_6484fa767586462da1923a1b1ec5dbc9: {r: 1024, g: 0, b: 0, a: 0}

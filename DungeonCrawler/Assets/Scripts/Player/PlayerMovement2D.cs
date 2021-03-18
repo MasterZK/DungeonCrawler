@@ -30,7 +30,8 @@ public class PlayerMovement2D : MonoBehaviour
     private float lastTapTimeA = 0;
     private float lastTapTimeD = 0;
 
-    [Header("Debug")]
+    [Header("Debug")] 
+    [SerializeField] public bool canMove = true;
     [SerializeField] private bool crouching = false;
     [SerializeField] private bool grounded = false;
     [SerializeField] private bool jumping = false;
@@ -53,7 +54,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     void Update()
     {
-        if (transitioning)
+        if (transitioning || !canMove)
             return;
 
         checkJumpInput();
@@ -64,7 +65,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         checkGrounded();
 
-        if (transitioning)
+        if (transitioning || !canMove)
             return;
 
         crouch();
@@ -169,6 +170,8 @@ public class PlayerMovement2D : MonoBehaviour
         return dashDistance;
     }
 
+    public void SetPlayerMove() => canMove = !canMove;
+    
     bool crouch()
     {
         crouching = Input.GetAxisRaw("VerticalNeg") != 0;

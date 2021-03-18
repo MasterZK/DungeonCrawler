@@ -159,7 +159,7 @@ MonoBehaviour:
   - {x: -0.5, y: 0.5, z: 0}
   m_ShapePathHash: 0
   m_Mesh: {fileID: 0}
-  m_InstanceId: -20780
+  m_InstanceId: -1346670
 --- !u!114 &451836140337530451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,12 +175,18 @@ MonoBehaviour:
   movementSpeed: 200
   deaccelerationMultiplier: 0.05
   crouchMultiplier: 0.5
+  fallMultiplier: 2
+  maxJumps: 2
   jumpVelocity: 500
   jumpMultiplier: 1
-  fallMultiplier: 2
+  dashDistance: 5
+  dashSpeed: 0.5
+  iFrames: 1
+  tapSpeed: 0.5
   crouching: 0
   grounded: 1
   jumping: 0
+  dashing: 0
   transitioning: 0
 --- !u!114 &5013992074407076989
 MonoBehaviour:

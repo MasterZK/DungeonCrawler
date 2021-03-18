@@ -1,6 +1,11 @@
 using Unity.Mathematics;
 using UnityEngine;
 
+public enum RoomType
+{
+
+}
+
 public class DungeonRoom : MonoBehaviour
 {
     [SerializeField] private float height, width = 0;

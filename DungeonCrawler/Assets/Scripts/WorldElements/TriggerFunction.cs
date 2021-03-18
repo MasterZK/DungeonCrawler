@@ -6,6 +6,11 @@ public class TriggerFunction : MonoBehaviour
 {
     [SerializeField] private UnityEvent functionsToCall;
 
+    private void OnParticleCollision(GameObject other)
+    {
+        functionsToCall.Invoke();
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         functionsToCall.Invoke();

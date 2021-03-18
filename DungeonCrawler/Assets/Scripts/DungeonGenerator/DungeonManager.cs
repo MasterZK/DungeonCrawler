@@ -5,11 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Mathematics;
 
-public struct RoomType
-{
-
-}
-
 /// <summary>
 /// Manages the generation of a dungeon floors
 /// by Zayarmoe Kyaw 
@@ -20,7 +15,7 @@ public class DungeonManager : MonoBehaviour
     [SerializeField] private int seed;
     [SerializeField] private bool useSeed = true;
 
-    [Range(0.0f, 1.0f)]
+    [Range(0.1f, 1.0f)]
     [SerializeField] private float floorDensity = 0.5f;
     [SerializeField] private int2 maxFloorSize;
     [SerializeField] private int minRoomsSpawned;
@@ -54,9 +49,12 @@ public class DungeonManager : MonoBehaviour
     private Stack<Vector2Int> spawnBuffer = new Stack<Vector2Int>();
     private System.Random rand;
 
-
     void Start()
     {
+        var dungeonValues = GameObject.FindObjectOfType<DungeonValues>();
+        if (dungeonValues != null && dungeonValues.edited)
+            setValues(dungeonValues);
+
         //float startTime = Time.realtimeSinceStartup;
 
         spawnableRooms = Resources.LoadAll<GameObject>("RoomPrefabs");
@@ -90,6 +88,12 @@ public class DungeonManager : MonoBehaviour
 
         if (debugTextoutput)
             printMapAsText();
+
+    }
+
+    private void setValues(DungeonValues newValues)
+    {
+
     }
 
     private void OnDestroy()

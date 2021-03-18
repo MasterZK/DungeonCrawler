@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d21dcc2386d650c4597f3633c75a1f98, type: 3}
-  m_Name: On
+  m_Name: ScreenFade
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -18,7 +18,7 @@ MonoBehaviour:
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: -4289053425567273203}
+  m_Parent: {fileID: -6178637918732299389}
   m_Children: []
   m_Clips:
   - m_Version: 1
@@ -28,7 +28,7 @@ MonoBehaviour:
     m_Duration: 1
     m_TimeScale: 1
     m_ParentTrack: {fileID: -8363984675258274130}
-    m_EaseInDuration: 0.2
+    m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: -1
     m_BlendOutDuration: -1
@@ -87,18 +87,18 @@ MonoBehaviour:
     m_Recordable: 0
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 1
-    m_PostExtrapolationTime: 0
+    m_PostExtrapolationTime: 0.5
     m_PreExtrapolationTime: 0
     m_DisplayName: ScreenFadeOn
   - m_Version: 1
-    m_Start: 1
+    m_Start: 1.5
     m_ClipIn: 0
     m_Asset: {fileID: 3780588154627431754}
     m_Duration: 1
     m_TimeScale: 1
     m_ParentTrack: {fileID: -8363984675258274130}
     m_EaseInDuration: 0
-    m_EaseOutDuration: 0.2
+    m_EaseOutDuration: 0
     m_BlendInDuration: -1
     m_BlendOutDuration: -1
     m_MixInCurve:
@@ -161,7 +161,7 @@ MonoBehaviour:
   m_OpenClipOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
   m_Rotation: {x: 0, y: 0, z: 0, w: 1}
   m_ApplyOffsets: 0
---- !u!114 &-4289053425567273203
+--- !u!114 &-6178637918732299389
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -221,8 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Version: 0
   m_Tracks:
-  - {fileID: -4289053425567273203}
-  m_FixedDuration: 0
+  - {fileID: -6178637918732299389}
+  m_FixedDuration: 2
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1

@@ -6,16 +6,21 @@ public class DoorTeleporter : MonoBehaviour
 {
     [SerializeField] public Transform spawnPoint;
     [SerializeField] private Vector3 destinationPosition;
-    [SerializeField] private ScreenFade screenFader;
     [SerializeField] private double transitionTime = 0.40f;
     [SerializeField] private GameObject connectedPlatform;
+
+    [SerializeField] private ScreenFade screenFader;
+    [SerializeField] private Transform targetManuel;
 
     void Awake()
     {
         screenFader = GameObject.Find("ScreenFade").GetComponent<ScreenFade>();
 
-        if (destinationPosition != Vector3.zero)
+        if (destinationPosition != Vector3.zero || targetManuel != null)
+        {
+            destinationPosition = targetManuel.position;
             return;
+        }
 
         this.GetComponent<Collider2D>().isTrigger = false;
         if (connectedPlatform.GetComponent<Platform>().GetPlatformType())
