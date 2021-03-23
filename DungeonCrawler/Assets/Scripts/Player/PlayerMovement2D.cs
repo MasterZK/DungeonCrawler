@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerAttributes))]
+[RequireComponent(typeof(PlayerUI), typeof(Actor))]
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Movements Values")]
@@ -40,12 +40,14 @@ public class PlayerMovement2D : MonoBehaviour
 
     private Rigidbody2D playerRb2D;
     private Collider2D playerCollider;
+    private Actor playerActor;
     private Vector3 originalScale;
 
-    void Start()
+    void Awake()
     {
         playerRb2D = this.GetComponent<Rigidbody2D>();
         playerCollider = this.GetComponent<Collider2D>();
+        playerActor = this.GetComponent<Actor>();
         originalScale = this.transform.localScale;
         this.gameObject.tag = "Player";
 

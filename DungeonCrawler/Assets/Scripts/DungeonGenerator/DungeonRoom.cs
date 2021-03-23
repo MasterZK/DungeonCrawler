@@ -22,11 +22,6 @@ public class DungeonRoom : MonoBehaviour
         adjustSize();
     }
 
-    void OnValidate()
-    {
-        adjustSize();
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player"))
@@ -34,10 +29,10 @@ public class DungeonRoom : MonoBehaviour
 
         Camera.main.transform.SetPositionAndRotation(this.transform.position + new Vector3(0, 0, -10), Quaternion.identity);
 
-        var previousRoom = other.GetComponent<PlayerAttributes>().CurrentRoom;
+        var previousRoom = other.GetComponent<PlayerUI>().CurrentRoom;
         setNeighborRooms(previousRoom, false);
         setNeighborRooms(this.roomID, true);
-        other.GetComponent<PlayerAttributes>().CurrentRoom = this.roomID;
+        other.GetComponent<PlayerUI>().CurrentRoom = this.roomID;
     }
 
     private void setNeighborRooms(ID room, bool state)

@@ -7,6 +7,7 @@ public class Weapon : MonoBehaviour
     [SerializeField] private ParticleSystem part;
     [SerializeField] private GameObject projectileImpact;
     [SerializeField] private float impactForce = 10;
+    [SerializeField] public WeaponController controller;
 
     private List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
 

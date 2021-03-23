@@ -159,7 +159,7 @@ MonoBehaviour:
   - {x: -0.5, y: 0.5, z: 0}
   m_ShapePathHash: 0
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1346670
+  m_InstanceId: -22234
 --- !u!114 &451836140337530451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +183,7 @@ MonoBehaviour:
   dashSpeed: 0.5
   iFrames: 1
   tapSpeed: 0.5
+  canMove: 1
   crouching: 0
   grounded: 1
   jumping: 0
@@ -200,7 +201,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75c87a2b8fa259841823f1c876c5dd77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 100
-  maxHealth: 100
   healthBar: {fileID: 0}
   healthText: {fileID: 0}

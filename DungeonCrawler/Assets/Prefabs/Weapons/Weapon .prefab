@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 269a517b45210a34e81dd2f5540a6316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damagePerShot: 0
   shootDirection: {x: 0, y: 0}
   weaponSnapSpeed: 10
   projectiles: {fileID: 8228668724655332715}
@@ -114,7 +115,7 @@ GameObject:
   - component: {fileID: 8228668724655332716}
   m_Layer: 0
   m_Name: WeaponProjectile
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -148,6 +149,7 @@ MonoBehaviour:
   part: {fileID: 8228668724655332715}
   projectileImpact: {fileID: 8444596040865675302, guid: f4e70613ea4491b44af849f749ecb3a3, type: 3}
   impactForce: 30
+  controller: {fileID: 8228668724469406795}
 --- !u!198 &8228668724655332715
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -5087,4 +5089,4 @@ MonoBehaviour:
   - {x: 0.011691093, y: 0.5052947, z: 0}
   m_ShapePathHash: 1309037153
   m_Mesh: {fileID: 0}
-  m_InstanceId: -247792
+  m_InstanceId: -259700

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Actor))]
 public abstract class EnemyBehaviour : MonoBehaviour
 {
     [Header("Enemy Attributes")]
@@ -18,16 +18,19 @@ public abstract class EnemyBehaviour : MonoBehaviour
     [Header("Animation")]
     [SerializeField] protected float spawnSpeed = 0.5f;
 
+    protected float start = 0;
     protected ID currentRoom;
-    protected PlayerAttributes player;
     protected Rigidbody2D enemyRb;
     protected Collider2D enemyCollider;
     protected Animator enemyAnimator;
+    protected Actor enemyActor;
 
-    protected float start = 0;
+    protected PlayerUI player;
 
     protected virtual void Awake()
     {
+        enemyActor = GetComponent<Actor>();
+
         enemyCollider = this.GetComponent<Collider2D>();
         GetComponent<Renderer>().material = Instantiate(GetComponent<Renderer>().material);
 
@@ -45,14 +48,9 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
     protected virtual void Start()
     {
-        player = GameObject.FindObjectOfType<PlayerAttributes>();
+        player = GameObject.FindObjectOfType<PlayerUI>();
 
         this.gameObject.tag = "Hostile";
-    }
-
-    protected virtual void Update()
-    {
-
     }
 
     protected virtual void FixedUpdate()
@@ -66,6 +64,12 @@ public abstract class EnemyBehaviour : MonoBehaviour
     }
 
     protected abstract void Behaviour();
+
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.CompareTag("Player"))
+            enemyActor.Damage(other.GetComponent<Weapon>().controller.GetDPS());
+    }
 
     protected async void spawnAnimation()
     {

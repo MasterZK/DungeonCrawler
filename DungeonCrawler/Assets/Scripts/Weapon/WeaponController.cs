@@ -15,6 +15,8 @@ struct WeaponStats
 
     //shape
     public float accuracy;                  //arc & /2 z rotation offset        //0-90
+
+    public float damage;
 }
 
 public enum WeaponType
@@ -28,7 +30,8 @@ public enum WeaponType
 
 public class WeaponController : MonoBehaviour
 {
-    [Header("Weapon Base Attributes")]
+    [Header("Weapon Base Attributes")] 
+    [SerializeField] private float damagePerShot;
     [SerializeField] private Vector2 shootDirection;
     [SerializeField] private float weaponSnapSpeed = 1;
     
@@ -73,6 +76,10 @@ public class WeaponController : MonoBehaviour
 
     public void SetMouseState(bool state) => Cursor.visible = state;
 
+    public WeaponType GetCurrentWeapon() => currentWeapon;
+
+    public float GetDPS() => damagePerShot;
+
     void initWeaponStats()
     {
         WeaponStats newWeapon = new WeaponStats();
@@ -87,6 +94,8 @@ public class WeaponController : MonoBehaviour
         newWeapon.fireRate = 1;
         newWeapon.accuracy = 10;
 
+        newWeapon.damage = 10;
+
         weaponPresets.Add(WeaponType.Automatic,newWeapon);
 
         //shotgun
@@ -98,6 +107,8 @@ public class WeaponController : MonoBehaviour
         newWeapon.bulletsPerShot = 6;
         newWeapon.fireRate = 1;
         newWeapon.accuracy = 30;
+
+        newWeapon.damage = 4;
 
         weaponPresets.Add(WeaponType.Shotgun, newWeapon);
 
@@ -128,6 +139,7 @@ public class WeaponController : MonoBehaviour
         shape.arc = newWeaponStats.accuracy;
         shape.rotation = new Vector3(0,0,-newWeaponStats.accuracy / 2);
 
+        this.damagePerShot = newWeaponStats.damage;
     }
 
     void shootProjectile()
