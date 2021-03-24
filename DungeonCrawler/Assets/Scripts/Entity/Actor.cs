@@ -15,12 +15,16 @@ public class Actor : MonoBehaviour
     private SpriteRenderer sprite;
     protected Color actorColor;
 
+    private EnemySpawner spawner;
+
     protected void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
         actorColor = sprite.color;
         currentHealth = maxHealth;
     }
+
+    public void SetSpawner(EnemySpawner spawner) => this.spawner = spawner;
 
     public void Damage(float damage)
     {
@@ -69,7 +73,7 @@ public class Actor : MonoBehaviour
 
     private void OnDeath()
     {
-
+        spawner.EnemyDeath(this);
     }
 
 }

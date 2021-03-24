@@ -3,9 +3,10 @@ using UnityEngine;
 
 public enum RoomType
 {
-
+    //TODO add different room types and auto generator for interior
 }
 
+[RequireComponent(typeof(EnemySpawner))]
 public class DungeonRoom : MonoBehaviour
 {
     [SerializeField] private float height, width = 0;
@@ -15,11 +16,15 @@ public class DungeonRoom : MonoBehaviour
     private RoomType roomType;
     private ID roomID;
     private DungeonManager dungeonManager;
+    private EnemySpawner spawner;
 
     void Awake()
     {
         dungeonManager = GameObject.FindObjectOfType<DungeonManager>();
+        spawner = this.GetComponent<EnemySpawner>();
         adjustSize();
+
+        spawner.SetSpawnArea(height,width);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -33,6 +38,9 @@ public class DungeonRoom : MonoBehaviour
         setNeighborRooms(previousRoom, false);
         setNeighborRooms(this.roomID, true);
         other.GetComponent<PlayerUI>().CurrentRoom = this.roomID;
+
+        if (!spawner.spawned)
+            spawner.SpawnEnemies();
     }
 
     private void setNeighborRooms(ID room, bool state)
@@ -99,6 +107,8 @@ public class DungeonRoom : MonoBehaviour
     {
         roomID = new int2(xID, yID);
         this.gameObject.name = (roomID.X + 1) + " " + (roomID.Y + 1);
+
+        spawner.roomID = this.roomID;
     }
 
     public ID GetRoomID() => roomID;

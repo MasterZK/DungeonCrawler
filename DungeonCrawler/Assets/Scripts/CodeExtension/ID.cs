@@ -42,4 +42,6 @@ public struct ID : IEquatable<ID>
     public override bool Equals(object obj) => (obj is ID id) && Equals(id);
 
     public override int GetHashCode() =>  (int) math.hash(this);
+
+    public override string ToString() => this.X + " " + this.Y;
 }

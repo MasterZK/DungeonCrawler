@@ -89,11 +89,12 @@ public class DungeonManager : MonoBehaviour
         if (debugTextoutput)
             printMapAsText();
 
+        dungeonFloor.Dispose();
     }
 
     private void setValues(DungeonValues newValues)
     {
-
+        //TODO
     }
 
     private void OnDestroy()

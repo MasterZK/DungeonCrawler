@@ -19,7 +19,8 @@ public abstract class EnemyBehaviour : MonoBehaviour
     [SerializeField] protected float spawnSpeed = 0.5f;
 
     protected float start = 0;
-    protected ID currentRoom;
+    public ID currentRoom;
+
     protected Rigidbody2D enemyRb;
     protected Collider2D enemyCollider;
     protected Animator enemyAnimator;

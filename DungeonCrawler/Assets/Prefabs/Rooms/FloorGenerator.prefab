@@ -67,6 +67,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8498209692391531403}
   - component: {fileID: 8498209692391531397}
+  - component: {fileID: 2810161670872855512}
   m_Layer: 0
   m_Name: FloorGenerator
   m_TagString: Untagged
@@ -103,20 +104,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 24042002
   useSeed: 1
-  minRoomsSpawned: 43
-  maxRoomsSpawned: 62
   floorDensity: 0.4
   maxFloorSize:
     x: 10
     y: 20
-  aproxDistanceRoomsX: 25
-  aproxDistanceRoomsY: 15
+  minRoomsSpawned: 43
+  maxRoomsSpawned: 62
+  approxDistanceRoomsX: 25
+  approxDistanceRoomsY: 15
   prefabManager: {fileID: 0}
   spawnableRooms: []
   startSpawnRoom: {fileID: 2284654194959472384, guid: d4f3433fffe49344f8b99e81194bda1c, type: 3}
-  LodActive: 1
-  createRooms: 0
+  raycastPlane: {fileID: 8498209692275791478}
   createAstar: 1
+  createRooms: 1
+  LodActive: 1
+  debugSetActive: 1
   debugTextoutput: 0
   debugOutput: {fileID: 0}
-  raycastPlane: {fileID: 8498209692275791478}
+--- !u!114 &2810161670872855512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8498209692391531396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761a1aee06760d84180bb9659dbe592b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemysPerRoom: 1
+  MeleeEnemy: {fileID: 3942477859959802659, guid: e1f4032a4ddbfed42be72e2e832237c4, type: 3}

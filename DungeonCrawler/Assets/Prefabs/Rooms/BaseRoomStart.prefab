@@ -17,7 +17,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 638893202936583450, guid: a844f7eee1b7a8844a847c3f5e49cd3e, type: 3}
       propertyPath: m_Name
-      value: BaseRoom
+      value: BaseRoomStart
       objectReference: {fileID: 0}
     - target: {fileID: 1375422200991755772, guid: a844f7eee1b7a8844a847c3f5e49cd3e, type: 3}
       propertyPath: m_Mesh
@@ -26,6 +26,10 @@ PrefabInstance:
     - target: {fileID: 1431232045290400212, guid: a844f7eee1b7a8844a847c3f5e49cd3e, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1470455997246626613, guid: a844f7eee1b7a8844a847c3f5e49cd3e, type: 3}
+      propertyPath: overrideDontSpawn
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2043338681676489024, guid: a844f7eee1b7a8844a847c3f5e49cd3e, type: 3}
       propertyPath: m_Color.b
